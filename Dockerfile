@@ -27,7 +27,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . /app/
 
 # Create the media directory and staticfiles directory inside Django folder
-RUN mkdir -p /app/agrotrust_django/media /app/agrotrust_django/staticfiles
+RUN mkdir -p /app/agrotrust_django/media /app/agrotrust_django/staticfiles /app/agrotrust_django/static
 
 # Run collectstatic to prepare all static assets (served cleanly via WhiteNoise)
 RUN python /app/agrotrust_django/manage.py collectstatic --noinput
