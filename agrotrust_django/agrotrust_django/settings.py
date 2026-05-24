@@ -57,6 +57,19 @@ MIDDLEWARE = [
 
 X_FRAME_OPTIONS = 'ALLOWALL'
 
+# CSRF Trusted Origins for proxy routing (e.g. Hugging Face Spaces)
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.hf.space',
+    'https://*.huggingface.co',
+]
+
+csrf_origins_env = os.environ.get('CSRF_TRUSTED_ORIGINS')
+if csrf_origins_env:
+    for origin in csrf_origins_env.split(','):
+        origin_clean = origin.strip()
+        if origin_clean:
+            CSRF_TRUSTED_ORIGINS.append(origin_clean)
+
 ROOT_URLCONF = 'agrotrust_django.urls'
 
 TEMPLATES = [
