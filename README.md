@@ -1,3 +1,13 @@
+---
+title: AgroTrust AI
+emoji: 🌾
+colorFrom: purple
+colorTo: indigo
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # 🌾 AgroTrust AI
 
 **Privacy-First B2B Agricultural Supply Chain Verification Platform**
