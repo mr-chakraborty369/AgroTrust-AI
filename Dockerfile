@@ -38,6 +38,5 @@ RUN python manage.py collectstatic --noinput
 # Expose port 7860
 EXPOSE 7860
 
-# Start Gunicorn with a 180-second timeout to allow the YOLOv8 and EasyOCR models
-# to fully load into Django RAM on server startup without Gunicorn killing the process.
-CMD ["gunicorn", "agrotrust_django.wsgi:application", "--bind", "0.0.0.0:7860", "--timeout", "180", "--workers", "1"]
+# Run migrations on container startup, then launch Gunicorn with a 180-second timeout.
+CMD python manage.py migrate --noinput && gunicorn agrotrust_django.wsgi:application --bind 0.0.0.0:7860 --timeout 180 --workers 1
