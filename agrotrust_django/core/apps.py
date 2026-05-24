@@ -44,9 +44,9 @@ class CoreConfig(AppConfig):
                 from django.contrib.auth.models import User
                 from core.models import Profile
                 
-                username = "superadmin"
-                email = "superadmin@agrotrust.co"
-                password = "admin123"
+                username = os.environ.get("SUPERADMIN_USERNAME", "superadmin")
+                email = os.environ.get("SUPERADMIN_EMAIL", "superadmin@agrotrust.co")
+                password = os.environ.get("SUPERADMIN_PASSWORD", "admin123")
                 
                 if not User.objects.filter(username=username).exists():
                     user = User.objects.create_superuser(
