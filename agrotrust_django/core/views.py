@@ -299,7 +299,7 @@ def login_view(request):
 
 def admin_login_view(request):
     if request.user.is_authenticated:
-        if request.user.profile.role == 'admin':
+        if request.user.profile.role in ('admin', 'superadmin'):
             return redirect("/dashboard/")
         else:
             logout(request)
@@ -314,7 +314,7 @@ def admin_login_view(request):
             user_obj = User.objects.get(email__iexact=email)
             user = authenticate(username=user_obj.username, password=password)
             if user is not None:
-                if user.profile.role == 'admin':
+                if user.profile.role in ('admin', 'superadmin'):
                     login(request, user)
                     return redirect("/dashboard/")
                 else:
@@ -491,7 +491,7 @@ def google_auth_view(request):
 @login_required
 def dashboard_view(request):
     profile = request.user.profile
-    if profile.role != 'admin':
+    if profile.role not in ('admin', 'superadmin'):
         logout(request)
         return redirect("/login/farmer/")
         
