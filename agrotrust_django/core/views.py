@@ -338,32 +338,87 @@ def register_view(request):
 
 
 def admin_register_view(request):
-    if request.user.is_authenticated:
+    """Public admin self-registration is DISABLED.
+    Only a superuser can create admin accounts via /superadmin/create-admin/
+    """
+    return redirect("/login/admin/")
+
+
+@login_required
+def create_admin_view(request):
+    """Superuser-only view to create new Cooperative Admin accounts."""
+    if not request.user.is_superuser:
         return redirect("/dashboard/")
 
     error = ""
     success = ""
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        coop_name = request.POST.get("coop_name", "").strip()
-        email = request.POST.get("email", "").strip().lower()
-        password = request.POST.get("password", "").strip()
-        
-        if not name or not coop_name or not email or not password:
-            error = "Please fill in all Admin fields."
-        elif User.objects.filter(email=email).exists():
-            error = "This email is already registered."
-        else:
-            username = f"admin_{uuid.uuid4().hex[:6]}"
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user.first_name = name
-            user.save()
-            user.profile.role = "admin"
-            user.profile.coop_name = coop_name
-            user.profile.save()
-            success = "Cooperative Admin created! Switch to Sign In."
+    admins = User.objects.filter(profile__role="admin").select_related("profile").order_by("-date_joined")
 
-    return render(request, "admin_login.html", {"error": error, "success": success, "is_register": True})
+    if request.method == "POST":
+        action = request.POST.get("action", "create")
+
+        if action == "create":
+            name = request.POST.get("name", "").strip()
+            coop_name = request.POST.get("coop_name", "").strip()
+            email = request.POST.get("email", "").strip().lower()
+            password = request.POST.get("password", "").strip()
+
+            if not name or not coop_name or not email or not password:
+                error = "All fields are required."
+            elif User.objects.filter(email=email).exists():
+                error = f"An account with email '{email}' already exists."
+            elif len(password) < 8:
+                error = "Password must be at least 8 characters."
+            else:
+                username = f"admin_{uuid.uuid4().hex[:6]}"
+                new_user = User.objects.create_user(username=username, email=email, password=password)
+                new_user.first_name = name
+                new_user.save()
+                new_user.profile.role = "admin"
+                new_user.profile.coop_name = coop_name
+                new_user.profile.save()
+                success = f"Admin account created for {name} ({email})."
+                admins = User.objects.filter(profile__role="admin").select_related("profile").order_by("-date_joined")
+
+        elif action == "revoke":
+            target_id = request.POST.get("user_id")
+            try:
+                target = User.objects.get(id=target_id)
+                # Prevent revoking own superuser account
+                if target.id != request.user.id:
+                    target.profile.role = "farmer"
+                    target.is_active = False
+                    target.profile.save()
+                    target.save()
+                    success = f"Admin access revoked for {target.first_name or target.username}."
+                    admins = User.objects.filter(profile__role="admin").select_related("profile").order_by("-date_joined")
+                else:
+                    error = "You cannot revoke your own account."
+            except User.DoesNotExist:
+                error = "User not found."
+
+    return render(request, "create_admin.html", {
+        "error": error,
+        "success": success,
+        "admins": admins,
+        # Platform-wide data
+        "all_users": User.objects.select_related("profile").order_by("-date_joined")[:50],
+        "recent_verifications": VerificationRecord.objects.select_related("user").order_by("-created_at")[:20],
+        "recent_transactions": DisbursementTransaction.objects.select_related(
+            "verification_record__user"
+        ).order_by("-created_at")[:20],
+        # Aggregate stats
+        "stats": {
+            "total_admins": User.objects.filter(profile__role="admin").count(),
+            "total_farmers": User.objects.filter(profile__role="farmer").count(),
+            "total_verifications": VerificationRecord.objects.count(),
+            "total_transactions": DisbursementTransaction.objects.count(),
+            "total_settled": DisbursementTransaction.objects.filter(status="SETTLED").count(),
+            "total_net_settled": DisbursementTransaction.objects.filter(
+                status="SETTLED"
+            ).values_list("net_settlement", flat=True),
+        },
+    })
 
 
 def logout_view(request):

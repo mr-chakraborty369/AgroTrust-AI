@@ -1,0 +1,523 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}SuperAdmin Control Center — AgroTrust AI{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-brand-canvas pb-16">
+
+  <!-- ── Top Header Bar ─────────────────────────────────────── -->
+  <div
+    class="bg-gradient-to-r from-[#1a0533] via-[#2d0a57] to-[#1a0533] border-b border-purple-900/40 px-4 sm:px-8 py-5">
+    <div class="max-w-7xl mx-auto flex items-center justify-center gap-3">
+      <div class="flex items-center gap-3 text-center">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
+          <i data-lucide="shield-alert" class="w-5 h-5 text-purple-300" stroke-width="2.5"></i>
+        </div>
+        <div>
+          <h1 class="text-lg font-black text-white font-display tracking-tight leading-none">SuperAdmin Control Center
+          </h1>
+          <p class="text-[10px] text-purple-300/70 uppercase tracking-widest font-bold mt-0.5">AgroTrust AI · Platform
+            Management</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+
+    <!-- ── Alert Messages ──────────────────────────────────── -->
+    {% if error %}
+    <div
+      class="flex items-start gap-2.5 p-4 rounded-2xl bg-red-500/5 border border-red-500/20 text-red-700 text-xs animate-fadeInScale">
+      <i data-lucide="alert-circle" class="w-4 h-4 shrink-0 mt-0.5 text-red-500"></i>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+    {% if success %}
+    <div
+      class="flex items-start gap-2.5 p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-700 text-xs animate-fadeInScale">
+      <i data-lucide="check-circle-2" class="w-4 h-4 shrink-0 mt-0.5 text-emerald-500"></i>
+      <span>{{ success }}</span>
+    </div>
+    {% endif %}
+
+    <!-- ── Stats Overview ──────────────────────────────────── -->
+    {% with total_settled_amount=stats.total_net_settled %}
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 animate-fadeInUp">
+      <div class="glass-card p-4 border border-brand-mute/40 bg-brand-canvas-soft text-center">
+        <p class="text-2xl font-black text-purple-700">{{ stats.total_admins }}</p>
+        <p class="text-[9px] font-black text-brand-body uppercase tracking-widest mt-1">Admins</p>
+      </div>
+      <div class="glass-card p-4 border border-brand-mute/40 bg-brand-canvas-soft text-center">
+        <p class="text-2xl font-black text-brand-orange">{{ stats.total_farmers }}</p>
+        <p class="text-[9px] font-black text-brand-body uppercase tracking-widest mt-1">Farmers</p>
+      </div>
+      <div class="glass-card p-4 border border-brand-mute/40 bg-brand-canvas-soft text-center">
+        <p class="text-2xl font-black text-brand-ink">{{ stats.total_verifications }}</p>
+        <p class="text-[9px] font-black text-brand-body uppercase tracking-widest mt-1">Verifications</p>
+      </div>
+      <div class="glass-card p-4 border border-brand-mute/40 bg-brand-canvas-soft text-center">
+        <p class="text-2xl font-black text-emerald-600">{{ stats.total_settled }}</p>
+        <p class="text-[9px] font-black text-brand-body uppercase tracking-widest mt-1">Settled Txns</p>
+      </div>
+      <div class="glass-card p-4 border border-brand-mute/40 bg-brand-canvas-soft text-center">
+        <p class="text-2xl font-black text-brand-ink">{{ stats.total_transactions }}</p>
+        <p class="text-[9px] font-black text-brand-body uppercase tracking-widest mt-1">Total Txns</p>
+      </div>
+      <div class="glass-card p-4 border border-purple-500/20 bg-purple-500/5 text-center col-span-2 sm:col-span-1">
+        <p class="text-2xl font-black text-purple-700">1</p>
+        <p class="text-[9px] font-black text-purple-600 uppercase tracking-widest mt-1">SuperAdmins</p>
+      </div>
+    </div>
+    {% endwith %}
+
+    <!-- ── Tab Navigation ──────────────────────────────────── -->
+    <div class="flex gap-1 p-1 bg-brand-canvas-soft border border-brand-mute/40 rounded-2xl w-fit flex-wrap">
+      <button onclick="showTab('tab-admins')" id="btn-tab-admins"
+        class="superadmin-tab active px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+        <i data-lucide="shield" class="w-3.5 h-3.5"></i> Manage Admins
+      </button>
+      <button onclick="showTab('tab-users')" id="btn-tab-users"
+        class="superadmin-tab px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+        <i data-lucide="users" class="w-3.5 h-3.5"></i> All Users
+      </button>
+      <button onclick="showTab('tab-verifications')" id="btn-tab-verifications"
+        class="superadmin-tab px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+        <i data-lucide="scan-line" class="w-3.5 h-3.5"></i> Verifications
+      </button>
+      <button onclick="showTab('tab-transactions')" id="btn-tab-transactions"
+        class="superadmin-tab px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5">
+        <i data-lucide="landmark" class="w-3.5 h-3.5"></i> Transactions
+      </button>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB 1: Manage Admins                                   -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-admins" class="superadmin-panel grid grid-cols-1 lg:grid-cols-5 gap-6 animate-fadeInUp">
+
+      <!-- Create Admin Form -->
+      <div class="lg:col-span-2">
+        <div class="glass-card p-6 border border-brand-mute/40 bg-brand-canvas-soft h-full">
+          <div class="flex items-center gap-2 mb-5">
+            <i data-lucide="user-plus" class="w-4 h-4 text-brand-orange"></i>
+            <h2 class="text-sm font-bold text-brand-ink font-display">Assign New Admin</h2>
+          </div>
+          <div class="mb-4 p-3 rounded-xl bg-purple-500/5 border border-purple-500/15 flex items-start gap-2">
+            <i data-lucide="info" class="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5"></i>
+            <p class="text-[10px] text-purple-700">Public self-registration is permanently disabled. Only you can create
+              admin accounts.</p>
+          </div>
+          <form method="POST" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div>
+              <label class="block text-[10px] font-black text-brand-body uppercase tracking-wider mb-1.5">Full
+                Name</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="user"
+                    class="h-4 w-4 text-brand-body-mid"></i></span>
+                <input type="text" name="name" required placeholder="e.g. Rajesh Kumar"
+                  class="block w-full pl-9 pr-3 py-2.5 rounded-xl bg-brand-canvas border border-brand-mute text-brand-ink text-xs focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange/20 transition-all">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-brand-body uppercase tracking-wider mb-1.5">Cooperative /
+                Organization</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i
+                    data-lucide="building-2" class="h-4 w-4 text-brand-body-mid"></i></span>
+                <input type="text" name="coop_name" required placeholder="e.g. Nagpur Farmers Co-op"
+                  class="block w-full pl-9 pr-3 py-2.5 rounded-xl bg-brand-canvas border border-brand-mute text-brand-ink text-xs focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange/20 transition-all">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-brand-body uppercase tracking-wider mb-1.5">Email
+                Address</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="mail"
+                    class="h-4 w-4 text-brand-body-mid"></i></span>
+                <input type="email" name="email" required placeholder="admin@coop.com"
+                  class="block w-full pl-9 pr-3 py-2.5 rounded-xl bg-brand-canvas border border-brand-mute text-brand-ink text-xs focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange/20 transition-all">
+              </div>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-brand-body uppercase tracking-wider mb-1.5">Temporary
+                Password</label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i data-lucide="key"
+                    class="h-4 w-4 text-brand-body-mid"></i></span>
+                <input type="password" name="password" required minlength="8" placeholder="Min. 8 characters"
+                  class="block w-full pl-9 pr-3 py-2.5 rounded-xl bg-brand-canvas border border-brand-mute text-brand-ink text-xs focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange/20 transition-all">
+              </div>
+              <p class="text-[10px] text-brand-body-mid mt-1">Share credentials securely. Admin should change it after
+                first login.</p>
+            </div>
+            <button type="submit"
+              class="w-full py-3 px-6 rounded-xl font-bold text-sm text-brand-canvas bg-brand-orange hover:bg-[#e04500] hover:shadow-lg transition-all duration-350 flex items-center justify-center gap-2">
+              <i data-lucide="user-plus" class="w-4 h-4"></i> Create Admin Account
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Admin Accounts List -->
+      <div class="lg:col-span-3">
+        <div class="glass-card p-6 border border-brand-mute/40 bg-brand-canvas-soft">
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-2">
+              <i data-lucide="users" class="w-4 h-4 text-brand-orange"></i>
+              <h2 class="text-sm font-bold text-brand-ink font-display">Cooperative Admin Accounts</h2>
+            </div>
+            <span
+              class="text-[10px] font-black text-brand-body-mid bg-brand-canvas px-2.5 py-1 rounded-full border border-brand-mute">
+              {{ admins|length }} total
+            </span>
+          </div>
+          {% if admins %}
+          <div class="space-y-2.5">
+            {% for admin_user in admins %}
+            <div
+              class="flex items-center gap-3 p-3.5 rounded-xl bg-brand-canvas border border-brand-mute/60 hover:border-brand-mute transition-all group">
+              <div
+                class="w-9 h-9 rounded-xl bg-brand-orange/10 flex items-center justify-center shrink-0 font-bold text-brand-orange text-sm">
+                {{ admin_user.first_name|first|default:admin_user.username|first|upper }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-bold text-brand-ink truncate">{{
+                  admin_user.first_name|default:admin_user.username }}</p>
+                <p class="text-[10px] text-brand-body truncate">{{ admin_user.email }}</p>
+                {% if admin_user.profile.coop_name %}
+                <p class="text-[10px] text-brand-body-mid truncate mt-0.5">
+                  <i data-lucide="building-2" class="w-2.5 h-2.5 inline-block mr-0.5"></i>{{
+                  admin_user.profile.coop_name }}
+                </p>
+                {% endif %}
+              </div>
+              <div class="shrink-0 text-center">
+                {% if admin_user.is_active %}
+                <span
+                  class="inline-flex items-center gap-1 text-[9px] font-black text-emerald-700 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                  <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Active
+                </span>
+                {% else %}
+                <span
+                  class="inline-flex items-center gap-1 text-[9px] font-black text-red-700 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded-full">
+                  <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div> Revoked
+                </span>
+                {% endif %}
+                <p class="text-[9px] text-brand-body-mid mt-1">{{ admin_user.date_joined|date:"d M Y" }}</p>
+              </div>
+              {% if admin_user.id != request.user.id %}
+              <form method="POST" class="shrink-0"
+                onsubmit="return confirm('Revoke admin access for {{ admin_user.first_name|default:admin_user.username }}?')">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="revoke">
+                <input type="hidden" name="user_id" value="{{ admin_user.id }}">
+                <button type="submit"
+                  class="p-2 rounded-lg text-red-500/40 hover:text-red-600 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 transition-all opacity-0 group-hover:opacity-100"
+                  title="Revoke admin access">
+                  <i data-lucide="user-x" class="w-3.5 h-3.5"></i>
+                </button>
+              </form>
+              {% else %}
+              <div class="w-9 shrink-0 text-center">
+                <span class="text-[9px] text-purple-600 font-bold">You</span>
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% else %}
+          <div class="text-center py-10">
+            <div
+              class="w-12 h-12 rounded-2xl bg-brand-canvas border border-brand-mute flex items-center justify-center mx-auto mb-3">
+              <i data-lucide="users" class="w-5 h-5 text-brand-body-mid"></i>
+            </div>
+            <p class="text-xs font-bold text-brand-body">No admin accounts yet</p>
+            <p class="text-[11px] text-brand-body-mid mt-1">Use the form to assign the first cooperative admin.</p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB 2: All Users                                       -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-users" class="superadmin-panel hidden animate-fadeInUp">
+      <div class="glass-card border border-brand-mute/40 bg-brand-canvas-soft overflow-hidden">
+        <div class="px-6 py-4 border-b border-brand-mute/40 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="users" class="w-4 h-4 text-brand-orange"></i>
+            <h2 class="text-sm font-bold text-brand-ink font-display">All Platform Users</h2>
+          </div>
+          <span
+            class="text-[10px] font-black text-brand-body-mid bg-brand-canvas px-2.5 py-1 rounded-full border border-brand-mute">
+            Showing up to 50 latest
+          </span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="bg-brand-canvas border-b border-brand-mute/40">
+                <th class="text-left px-5 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">User</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Email
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Role</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">
+                  Cooperative</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Status
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Joined
+                </th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-brand-mute/30">
+              {% for u in all_users %}
+              <tr class="hover:bg-brand-canvas transition-all">
+                <td class="px-5 py-3">
+                  <div class="flex items-center gap-2.5">
+                    <div
+                      class="w-7 h-7 rounded-lg {% if u.is_superuser %}bg-purple-500/15{% elif u.profile.role == 'admin' %}bg-brand-orange/10{% else %}bg-emerald-500/10{% endif %} flex items-center justify-center text-[10px] font-black {% if u.is_superuser %}text-purple-700{% elif u.profile.role == 'admin' %}text-brand-orange{% else %}text-emerald-700{% endif %} shrink-0">
+                      {{ u.first_name|first|default:u.username|first|upper }}
+                    </div>
+                    <div>
+                      <p class="font-bold text-brand-ink">{{ u.first_name|default:u.username }}</p>
+                      <p class="text-[9px] text-brand-body-mid">@{{ u.username }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-brand-body">{{ u.email|default:"—" }}</td>
+                <td class="px-4 py-3">
+                  {% if u.is_superuser %}
+                  <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-purple-500/10 text-purple-700 border border-purple-500/20">
+                    <i data-lucide="shield-alert" class="w-2.5 h-2.5"></i> SuperAdmin
+                  </span>
+                  {% elif u.profile.role == 'admin' %}
+                  <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-brand-orange/10 text-brand-orange border border-brand-orange/20">
+                    <i data-lucide="shield" class="w-2.5 h-2.5"></i> Admin
+                  </span>
+                  {% else %}
+                  <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black bg-emerald-500/10 text-emerald-700 border border-emerald-500/20">
+                    <i data-lucide="leaf" class="w-2.5 h-2.5"></i> Farmer
+                  </span>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3 text-brand-body">{{ u.profile.coop_name|default:"—" }}</td>
+                <td class="px-4 py-3">
+                  {% if u.is_active %}
+                  <span class="text-[9px] font-black text-emerald-700">● Active</span>
+                  {% else %}
+                  <span class="text-[9px] font-black text-red-600">● Inactive</span>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3 text-brand-body-mid">{{ u.date_joined|date:"d M Y" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="6" class="px-5 py-10 text-center text-brand-body text-xs">No users found.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB 3: Verifications                                   -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-verifications" class="superadmin-panel hidden animate-fadeInUp">
+      <div class="glass-card border border-brand-mute/40 bg-brand-canvas-soft overflow-hidden">
+        <div class="px-6 py-4 border-b border-brand-mute/40 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="scan-line" class="w-4 h-4 text-brand-orange"></i>
+            <h2 class="text-sm font-bold text-brand-ink font-display">All Verification Records</h2>
+          </div>
+          <span
+            class="text-[10px] font-black text-brand-body-mid bg-brand-canvas px-2.5 py-1 rounded-full border border-brand-mute">
+            Latest 20 of {{ stats.total_verifications }}
+          </span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="bg-brand-canvas border-b border-brand-mute/40">
+                <th class="text-left px-5 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">ID</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">User</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">File</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Type</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Quality
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Trust
+                  Score</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Eligible
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Date</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-brand-mute/30">
+              {% for v in recent_verifications %}
+              <tr class="hover:bg-brand-canvas transition-all">
+                <td class="px-5 py-3 font-mono text-brand-body-mid text-[10px]">#{{ v.id }}</td>
+                <td class="px-4 py-3">
+                  <p class="font-bold text-brand-ink">{{ v.user.first_name|default:v.user.username }}</p>
+                  <p class="text-[9px] text-brand-body">{{ v.user.email }}</p>
+                </td>
+                <td class="px-4 py-3 text-brand-body max-w-[120px] truncate" title="{{ v.filename }}">{{ v.filename }}
+                </td>
+                <td class="px-4 py-3">
+                  <span
+                    class="text-[9px] font-black px-2 py-0.5 rounded-full bg-brand-canvas border border-brand-mute text-brand-body uppercase">{{
+                    v.analysis_type }}</span>
+                </td>
+                <td class="px-4 py-3">
+                  <span
+                    class="font-black {% if v.quality_score >= 80 %}text-emerald-600{% elif v.quality_score >= 60 %}text-amber-600{% else %}text-red-600{% endif %}">
+                    {{ v.quality_score|floatformat:1 }}%
+                  </span>
+                </td>
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-1.5">
+                    <div
+                      class="flex-1 h-1.5 bg-brand-canvas border border-brand-mute rounded-full overflow-hidden w-16">
+                      <div
+                        class="h-full rounded-full {% if v.trust_score >= 70 %}bg-emerald-500{% else %}bg-red-400{% endif %}"
+                        style="width: {{ v.trust_score }}%"></div>
+                    </div>
+                    <span class="font-black text-brand-ink">{{ v.trust_score|floatformat:1 }}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  {% if v.payment_eligible %}
+                  <span class="text-[9px] font-black text-emerald-700">✓ Yes</span>
+                  {% else %}
+                  <span class="text-[9px] font-black text-red-600">✗ No</span>
+                  {% endif %}
+                </td>
+                <td class="px-4 py-3 text-brand-body-mid text-[10px]">{{ v.created_at|date:"d M Y H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" class="px-5 py-10 text-center text-brand-body text-xs">No verification records found.
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════ -->
+    <!-- TAB 4: Transactions                                    -->
+    <!-- ══════════════════════════════════════════════════════ -->
+    <div id="tab-transactions" class="superadmin-panel hidden animate-fadeInUp">
+      <div class="glass-card border border-brand-mute/40 bg-brand-canvas-soft overflow-hidden">
+        <div class="px-6 py-4 border-b border-brand-mute/40 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <i data-lucide="landmark" class="w-4 h-4 text-brand-orange"></i>
+            <h2 class="text-sm font-bold text-brand-ink font-display">All Disbursement Transactions</h2>
+          </div>
+          <span
+            class="text-[10px] font-black text-brand-body-mid bg-brand-canvas px-2.5 py-1 rounded-full border border-brand-mute">
+            Latest 20 of {{ stats.total_transactions }}
+          </span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs">
+            <thead>
+              <tr class="bg-brand-canvas border-b border-brand-mute/40">
+                <th class="text-left px-5 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Txn ID
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">User</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Status
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Gross
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Fee</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Net
+                  Settled</th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Credit Ac
+                </th>
+                <th class="text-left px-4 py-3 text-[9px] font-black text-brand-body uppercase tracking-wider">Date</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-brand-mute/30">
+              {% for tx in recent_transactions %}
+              <tr class="hover:bg-brand-canvas transition-all">
+                <td class="px-5 py-3 font-mono text-[9px] text-brand-body-mid max-w-[120px]">
+                  <div title="{{ tx.transaction_id }}" class="truncate">{{ tx.transaction_id }}</div>
+                  <div class="text-[8px] text-brand-body-mid/60 truncate" title="{{ tx.reference }}">Ref: {{
+                    tx.reference }}</div>
+                </td>
+                <td class="px-4 py-3">
+                  <p class="font-bold text-brand-ink">{{
+                    tx.verification_record.user.first_name|default:tx.verification_record.user.username }}</p>
+                  <p class="text-[9px] text-brand-body">{{ tx.verification_record.user.email }}</p>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="inline-flex items-center gap-1 text-[9px] font-black px-2 py-0.5 rounded-full
+                      {% if tx.status == 'SETTLED' %}bg-emerald-500/10 text-emerald-700 border border-emerald-500/20
+                      {% else %}bg-amber-500/10 text-amber-700 border border-amber-500/20{% endif %}">
+                    <div
+                      class="w-1.5 h-1.5 rounded-full {% if tx.status == 'SETTLED' %}bg-emerald-500{% else %}bg-amber-500{% endif %}">
+                    </div>
+                    {{ tx.status }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 font-bold text-brand-ink">₹{{ tx.gross_amount|floatformat:2 }}</td>
+                <td class="px-4 py-3 text-red-600 font-bold">-₹{{ tx.fee_amount|floatformat:2 }}</td>
+                <td class="px-4 py-3 font-black text-emerald-700">₹{{ tx.net_settlement|floatformat:2 }}</td>
+                <td class="px-4 py-3 font-mono text-[10px] text-brand-body-mid max-w-[100px] truncate"
+                  title="{{ tx.credit_account }}">{{ tx.credit_account }}</td>
+                <td class="px-4 py-3 text-brand-body-mid text-[10px]">{{ tx.created_at|date:"d M Y H:i" }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="8" class="px-5 py-10 text-center text-brand-body text-xs">No transactions yet.</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  .superadmin-tab {
+    color: var(--color-brand-body);
+  }
+
+  .superadmin-tab.active {
+    background: white;
+    color: var(--color-brand-ink);
+    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.07);
+  }
+
+  html.dark .superadmin-tab.active {
+    background: var(--color-brand-canvas);
+  }
+</style>
+
+<script>
+  function showTab(tabId) {
+    // Hide all panels
+    document.querySelectorAll('.superadmin-panel').forEach(p => p.classList.add('hidden'));
+    // Deactivate all buttons
+    document.querySelectorAll('.superadmin-tab').forEach(b => b.classList.remove('active'));
+    // Show selected panel and activate button
+    document.getElementById(tabId).classList.remove('hidden');
+    document.getElementById('btn-' + tabId).classList.add('active');
+  }
+</script>
+{% endblock %}

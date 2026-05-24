@@ -120,10 +120,10 @@
               </span>
             </div>
 
-            {% if request.user.profile.role == 'admin' %}
-              <a href="/admin/" target="_blank" title="Django In-built Admin Panel" class="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-canvas-soft border border-brand-mute/30 text-xs font-bold text-brand-ink hover:text-brand-orange hover:bg-brand-canvas transition-all duration-300">
-                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
-                <span>Django Admin</span>
+            {% if request.user.is_superuser %}
+              <a href="{% url 'core:create_admin' %}" title="SuperAdmin — Assign Admin Accounts" class="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-purple-500/10 border border-purple-500/20 text-xs font-bold text-purple-700 hover:bg-purple-500/20 transition-all duration-300">
+                <i data-lucide="shield-alert" class="w-3.5 h-3.5"></i>
+                <span>Manage</span>
               </a>
             {% endif %}
 

@@ -98,45 +98,16 @@
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
 
-        <!-- Toggle Mode CTA -->
+        <!-- Admin accounts are invitation-only — no self-registration link shown -->
         <div class="mt-4 text-center">
-          {% if is_register %}
-            <a href="{% url 'core:admin_login' %}" class="text-xs text-brand-body hover:text-brand-ink transition-all cursor-pointer underline underline-offset-4">
-              Already have an account? Sign In
-            </a>
-          {% else %}
-            <a href="{% url 'core:admin_register' %}" class="text-xs text-brand-orange hover:text-[#e04500] font-bold cursor-pointer underline underline-offset-4">
-              Don't have an account? Register Admin Profile
-            </a>
-          {% endif %}
+          <p class="text-[10px] text-brand-body-mid font-medium">
+            <i data-lucide="lock" class="w-3 h-3 inline-block mr-1 opacity-50"></i>
+            Admin accounts are assigned by the SuperAdmin only.
+          </p>
         </div>
       </form>
 
-      <!-- Google Section (only shown on Sign-In page) -->
-      {% if not is_register %}
-        <div class="relative my-6 flex items-center justify-center">
-          <div class="absolute inset-0 flex items-center">
-            <div class="w-full border-t border-brand-mute/40"></div>
-          </div>
-          <span class="relative z-10 px-3 bg-brand-canvas-soft text-[10px] font-black text-brand-body-mid uppercase tracking-widest">
-            Or Sign In With
-          </span>
-        </div>
 
-        <button
-          type="button"
-          onclick="openGoogleAuthModal()"
-          class="w-full py-3 px-4 rounded-xl font-bold text-xs bg-brand-canvas border border-brand-ink hover:bg-brand-canvas-soft text-brand-ink transition-all cursor-pointer flex items-center justify-center gap-2.5"
-        >
-          <svg class="w-4 h-4" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69a5.79 5.79 0 01-2.51 3.76v3.13h4.05c2.37-2.17 3.71-5.38 3.71-8.74z"/>
-            <path fill="#34A853" d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-4.05-3.13c-1.12.75-2.57 1.2-3.91 1.2-3.02 0-5.58-2.04-6.49-4.78H1.36v3.23c2 3.97 6.1 6.63 10.64 6.63z"/>
-            <path fill="#FBBC05" d="M5.51 14.38a7.12 7.12 0 010-4.76V6.39H1.36a11.96 11.96 0 000 11.22l4.15-3.23z"/>
-            <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.22 0 12 0 7.46 0 3.36 2.66 1.36 6.39l4.15 3.23c.91-2.74 3.47-4.78 6.49-4.78z"/>
-          </svg>
-          <span>Continue with Google Secure Auth</span>
-        </button>
-      {% endif %}
 
       <!-- Pre-loaded Hints -->
       <div class="mt-6 pt-4 border-t border-brand-mute/30 text-center">
@@ -156,113 +127,5 @@
   </div>
 </div>
 
-<!-- Simulated Google Login Modal overlay -->
-<div id="google-modal" class="fixed inset-0 z-50 bg-[#02050b]/40 backdrop-blur-md hidden items-center justify-center p-4">
-  <div class="bg-brand-canvas border border-brand-mute rounded-2xl max-w-sm w-full p-6 shadow-2xl animate-fadeInScale">
-    
-    <!-- Step 1: Choose account popup -->
-    <div id="google-step-1">
-      <div class="flex items-center gap-2 mb-4">
-        <svg class="w-5 h-5" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v3.92h6.69a5.79 5.79 0 01-2.51 3.76v3.13h4.05c2.37-2.17 3.71-5.38 3.71-8.74z"/>
-          <path fill="#34A853" d="M12 24c3.24 0 5.97-1.08 7.96-2.91l-4.05-3.13c-1.12.75-2.57 1.2-3.91 1.2-3.02 0-5.58-2.04-6.49-4.78H1.36v3.23c2 3.97 6.1 6.63 10.64 6.63z"/>
-          <path fill="#FBBC05" d="M5.51 14.38a7.12 7.12 0 010-4.76V6.39H1.36a11.96 11.96 0 000 11.22l4.15-3.23z"/>
-          <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.22 0 12 0 7.46 0 3.36 2.66 1.36 6.39l4.15 3.23c.91-2.74 3.47-4.78 6.49-4.78z"/>
-        </svg>
-        <span class="text-xs font-black text-brand-ink font-sans tracking-wide">Sign in with Google</span>
-        <button onclick="closeGoogleAuthModal()" class="ml-auto text-xs text-brand-body hover:text-brand-ink font-bold">Cancel</button>
-      </div>
-      <h3 class="text-sm font-bold text-brand-ink mb-2">Choose a Google account</h3>
-      <p class="text-[11px] text-brand-body mb-4">to continue to <span class="text-brand-orange font-semibold">AgroTrust AI</span></p>
 
-      <div class="space-y-2">
-        <button onclick="submitGoogleAuth('admin')" class="w-full p-3 rounded-xl bg-brand-canvas-soft border border-brand-mute hover:border-brand-orange/40 hover:bg-brand-canvas transition-all text-left cursor-pointer flex items-center gap-3 group">
-          <div class="w-8 h-8 rounded-full bg-brand-ink/5 flex items-center justify-center font-bold text-brand-ink text-sm">NA</div>
-          <div class="flex-1 min-w-0">
-            <p class="text-xs font-bold text-brand-ink group-hover:text-brand-orange truncate">Nagpur Nagpur Coop Admin</p>
-            <p class="text-[10px] text-brand-body truncate">coop.admin.google@gmail.com</p>
-          </div>
-          <span class="ml-auto text-[9px] text-brand-ink font-bold bg-brand-ink/5 px-2 py-0.5 rounded border border-brand-ink/10 shrink-0">Admin</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Step 2: In-memory network handshake loader -->
-    <div id="google-step-2" class="hidden text-center py-6">
-      <div class="w-12 h-12 rounded-full border-2 border-brand-orange/20 border-t-brand-orange animate-spin mx-auto mb-4"></div>
-      <h3 class="text-sm font-bold text-brand-ink">Connecting Securely...</h3>
-      <p class="text-[11px] text-brand-body mt-1">Exchanging secure cryptographic session keys</p>
-      <div class="mt-4 p-3 rounded-xl bg-brand-canvas-soft border border-brand-mute/40 space-y-1.5 max-w-xs mx-auto text-left">
-        <div class="flex items-center gap-2 text-[9px] text-brand-body">
-          <div class="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse"></div>
-          Verifying Google credential integrity
-        </div>
-        <div class="flex items-center gap-2 text-[9px] text-brand-body">
-          <div class="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse"></div>
-          Checking EXIF compliance criteria
-        </div>
-        <div class="flex items-center gap-2 text-[9px] text-brand-body">
-          <div class="w-1.5 h-1.5 rounded-full bg-brand-orange animate-pulse"></div>
-          Initializing in-memory session footprint
-        </div>
-      </div>
-    </div>
-
-    <!-- Step 3: Successfully authenticated -->
-    <div id="google-step-3" class="hidden text-center py-6 animate-fadeInScale">
-      <i data-lucide="check-circle-2" class="w-12 h-12 text-brand-orange mx-auto mb-4"></i>
-      <h3 class="text-sm font-bold text-brand-ink">Authenticated Successfully</h3>
-      <p class="text-[11px] text-brand-body mt-1">Session initialized. Routing to AgroTrust Dashboard...</p>
-    </div>
-
-  </div>
-</div>
-
-<script>
-  function openGoogleAuthModal() {
-    document.getElementById("google-modal").style.display = "flex";
-    document.getElementById("google-step-1").classList.remove("hidden");
-    document.getElementById("google-step-2").classList.add("hidden");
-    document.getElementById("google-step-3").classList.add("hidden");
-  }
-
-  function closeGoogleAuthModal() {
-    document.getElementById("google-modal").style.display = "none";
-  }
-
-  function submitGoogleAuth(accountType) {
-    document.getElementById("google-step-1").classList.add("hidden");
-    document.getElementById("google-step-2").classList.remove("hidden");
-    
-    fetch('/auth/google/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-      },
-      body: JSON.stringify({ account_type: accountType })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.status === 'success') {
-        setTimeout(() => {
-          document.getElementById("google-step-2").classList.add("hidden");
-          document.getElementById("google-step-3").classList.remove("hidden");
-          
-          setTimeout(() => {
-            closeGoogleAuthModal();
-            window.location.href = "/dashboard/";
-          }, 1200);
-        }, 1500);
-      } else {
-        alert("Google Authentication failed: " + data.message);
-        closeGoogleAuthModal();
-      }
-    })
-    .catch(err => {
-      alert("Network connection error during OAuth simulation.");
-      closeGoogleAuthModal();
-    });
-  }
-</script>
 {% endblock %}
