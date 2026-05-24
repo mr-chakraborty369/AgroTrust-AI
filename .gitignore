@@ -42,3 +42,7 @@ Thumbs.db
 dist/
 build/
 *.log
+
+# Database & Sample Binaries
+*.sqlite3
+agrotrust_django/static/*.png

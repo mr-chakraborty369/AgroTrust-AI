@@ -650,8 +650,11 @@
   // --- Preseeded samples loaders ---
   function loadPreseededDemo(type) {
     clearSelectedFile();
-    const filename = type === 'invoice' ? 'invoice_sample.png' : 'crop_sample.png';
-    const filepath = `/static/${filename}`;
+    const isInvoice = type === 'invoice';
+    const filename = isInvoice ? 'invoice_sample.jpg' : 'crop_sample.jpg';
+    const filepath = isInvoice 
+      ? 'https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=800'
+      : 'https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?w=800';
 
     // Select suitable scan mode
     setScanMode(type === 'both' ? 'both' : type);
@@ -660,7 +663,7 @@
     fetch(filepath)
       .then(res => res.blob())
       .then(blob => {
-        const file = new File([blob], filename, { type: 'image/png' });
+        const file = new File([blob], filename, { type: 'image/jpeg' });
         processSelectedFile(file);
       })
       .catch(err => {
