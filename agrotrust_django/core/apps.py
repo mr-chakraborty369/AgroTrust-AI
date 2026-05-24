@@ -44,8 +44,8 @@ class CoreConfig(AppConfig):
                 from django.contrib.auth.models import User
                 from core.models import Profile
                 
-                username = "admin"
-                email = "admin@agrotrust.co"
+                username = "superadmin"
+                email = "superadmin@agrotrust.co"
                 password = "admin123"
                 
                 if not User.objects.filter(username=username).exists():
