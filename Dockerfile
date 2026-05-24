@@ -4,7 +4,7 @@ FROM python:3.12-slim
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PORT=8000
+    PORT=7860
 
 # Set the working directory in the container
 WORKDIR /app
@@ -35,9 +35,9 @@ RUN mkdir -p media staticfiles static
 # Run collectstatic to prepare all static assets (served cleanly via WhiteNoise)
 RUN python manage.py collectstatic --noinput
 
-# Expose port 8000
-EXPOSE 8000
+# Expose port 7860
+EXPOSE 7860
 
 # Start Gunicorn with a 180-second timeout to allow the YOLOv8 and EasyOCR models
 # to fully load into Django RAM on server startup without Gunicorn killing the process.
-CMD ["gunicorn", "agrotrust_django.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "180", "--workers", "1"]
+CMD ["gunicorn", "agrotrust_django.wsgi:application", "--bind", "0.0.0.0:7860", "--timeout", "180", "--workers", "1"]
