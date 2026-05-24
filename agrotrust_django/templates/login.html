@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Select Access Portal — AgroTrust AI{% endblock %}
+
+{% block content %}
+<div class="relative min-h-screen bg-brand-canvas flex items-center justify-center py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/[0.03] rounded-full blur-[120px] animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-ink/[0.02] rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
+  </div>
+
+  <div class="relative z-10 w-full max-w-4xl animate-fadeInUp">
+    <!-- Brand Header -->
+    <div class="flex flex-col items-center mb-12 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-orange to-brand-ink flex items-center justify-center shadow-lg shadow-brand-orange/20 mb-4">
+        <i data-lucide="leaf" class="w-6 h-6 text-white" stroke-width="2.5"></i>
+      </div>
+      <h2 class="text-4xl font-bold text-brand-ink tracking-tight font-display">
+        Welcome to <span class="text-brand-orange">AgroTrust AI</span>
+      </h2>
+      <p class="text-xs text-brand-body mt-2 uppercase tracking-widest font-black">
+        Privacy-First B2B Agricultural Verification Platform
+      </p>
+    </div>
+
+    <!-- Portal Selection Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      
+      <!-- Cooperative Admin Portal Card -->
+      <a href="{% url 'core:admin_login' %}" class="group relative glass-card p-8 border border-brand-mute/40 hover:border-brand-orange/40 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 bg-brand-canvas-soft flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-12 h-12 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center text-brand-orange group-hover:scale-110 transition-transform duration-300">
+              <i data-lucide="shield-check" class="w-6 h-6" stroke-width="2.5"></i>
+            </div>
+            <span class="text-[9px] font-black text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-full border border-brand-orange/20 uppercase tracking-widest">
+              Active Workspace
+            </span>
+          </div>
+          <h3 class="text-xl font-bold text-brand-ink font-display mb-3">
+            Cooperative Manager
+          </h3>
+          <p class="text-xs text-brand-body leading-relaxed mb-6 font-sans">
+            Access secure co-op admin workspaces to audit and evaluate crop quality metrics, parse invoice OCR data with dual-AI pipelines, and issue instantaneous B2B ledger settlements.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-bold text-brand-orange group-hover:translate-x-1 transition-transform duration-300">
+          <span>Enter Admin Workspace</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        </div>
+      </a>
+
+      <!-- Farmer Portal Card (Coming Soon) -->
+      <a href="{% url 'core:farmer_login' %}" class="group relative glass-card p-8 border border-brand-mute/40 hover:border-brand-orange/30 hover:scale-[1.02] hover:shadow-xl transition-all duration-300 bg-brand-canvas-soft flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-6">
+            <div class="w-12 h-12 rounded-xl bg-brand-ink/5 border border-brand-ink/15 flex items-center justify-center text-brand-body group-hover:scale-110 transition-transform duration-300">
+              <i data-lucide="sprout" class="w-6 h-6" stroke-width="2.5"></i>
+            </div>
+            <span class="text-[9px] font-black text-brand-body bg-brand-ink/5 px-2.5 py-1 rounded-full border border-brand-ink/15 uppercase tracking-widest">
+              Coming Soon
+            </span>
+          </div>
+          <h3 class="text-xl font-bold text-brand-ink font-display mb-3">
+            Farmer Portal
+          </h3>
+          <p class="text-xs text-brand-body leading-relaxed mb-6 font-sans">
+            Secure client-side farmer terminal designed to strip EXIF data, encrypt bank metadata, perform custom visual crop assessments, and claim payouts directly from local cooperatives.
+          </p>
+        </div>
+        <div class="flex items-center gap-2 text-xs font-bold text-brand-body group-hover:text-brand-orange transition-colors">
+          <span>Preview Farmer Pipeline</span>
+          <i data-lucide="arrow-right" class="w-4 h-4 text-brand-body group-hover:text-brand-orange group-hover:translate-x-1 transition-transform duration-300"></i>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- Bottom security badges -->
+    <div class="flex items-center justify-center gap-8 mt-16 text-center animate-fadeInUp">
+      <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-body-mid">
+        <i data-lucide="lock" class="w-3.5 h-3.5 text-brand-orange"></i>
+        AES-256 Secured
+      </div>
+      <div class="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-brand-body-mid">
+        <i data-lucide="eye-off" class="w-3.5 h-3.5 text-brand-orange"></i>
+        Zero-Trust Architecture
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

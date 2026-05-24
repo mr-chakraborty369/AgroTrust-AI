@@ -1,0 +1,436 @@
+:root {
+  --background: #fffefb;      /* Warm off-white canvas base */
+  --foreground: #201515;      /* Deep coffee-ink primary text */
+  --card-bg: #f8f4f0;         /* Soft cream canvas-soft */
+  --card-border: #c5c0b1;     /* Mute/soft border */
+  --accent-primary: #ff4f00;  /* Zapier Orange */
+  --accent-secondary: #2f2a26;/* Warm Ink Soft */
+  --accent-gradient: linear-gradient(135deg, #ff4f00, #2f2a26);
+  --glass-bg: rgba(248, 244, 240, 0.85);
+  --glass-border: rgba(32, 21, 21, 0.08);
+  --danger: #b91c1c;          /* High-contrast warm red */
+  --warning: #b45309;         /* High-contrast warm amber */
+  --success: #15803d;         /* High-contrast warm green */
+  --pice-gold: #b45309;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 79, 0, 0.25);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover { background: rgba(255, 79, 0, 0.45); }
+
+/* ---- Glass Card ---- */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-border);
+  border-radius: 0.75rem;
+}
+
+.glass-card-dark {
+  background: #201515;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 0.75rem;
+}
+
+/* ---- Text Gradients ---- */
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-gold {
+  background: linear-gradient(135deg, #b45309, #d97706);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ---- Gradient Border ---- */
+.gradient-border {
+  position: relative;
+  border-radius: 0.75rem;
+}
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  padding: 1px;
+  border-radius: 0.75rem;
+  background: var(--accent-gradient);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- Glow Utilities ---- */
+.glow-emerald {
+  box-shadow: 0 0 24px rgba(255, 79, 0, 0.1), 0 0 70px rgba(255, 79, 0, 0.04);
+}
+.glow-cyan {
+  box-shadow: 0 0 24px rgba(47, 42, 38, 0.1), 0 0 70px rgba(47, 42, 38, 0.04);
+}
+.glow-gold {
+  box-shadow: 0 0 24px rgba(180, 83, 9, 0.15), 0 0 70px rgba(180, 83, 9, 0.06);
+}
+.glow-success {
+  box-shadow: 0 0 30px rgba(21, 128, 61, 0.15), 0 0 80px rgba(21, 128, 61, 0.05),
+              inset 0 0 30px rgba(21, 128, 61, 0.02);
+}
+
+/* ---- Animations ---- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.94); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 8px rgba(52, 211, 153, 0.2); }
+  50%      { box-shadow: 0 0 28px rgba(52, 211, 153, 0.45); }
+}
+
+@keyframes pulse-glow-gold {
+  0%, 100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
+  50%      { box-shadow: 0 0 28px rgba(245, 158, 11, 0.45); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes blink-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.2; }
+}
+
+@keyframes ledger-appear {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+}
+
+@keyframes scan-line {
+  0%   { top: 0; }
+  100% { top: 100%; }
+}
+
+/* ---- Animation Classes ---- */
+.animate-fadeInUp             { animation: fadeInUp 0.55s ease-out forwards; }
+.animate-fadeInUp-delay-1     { animation: fadeInUp 0.55s ease-out 0.1s forwards; opacity: 0; }
+.animate-fadeInUp-delay-2     { animation: fadeInUp 0.55s ease-out 0.2s forwards; opacity: 0; }
+.animate-fadeInUp-delay-3     { animation: fadeInUp 0.55s ease-out 0.3s forwards; opacity: 0; }
+.animate-fadeInUp-delay-4     { animation: fadeInUp 0.55s ease-out 0.45s forwards; opacity: 0; }
+.animate-fadeInScale          { animation: fadeInScale 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-slideInRight         { animation: slideInRight 0.5s ease-out forwards; }
+.animate-pulse-glow           { animation: pulse-glow 2.2s ease-in-out infinite; }
+.animate-pulse-glow-gold      { animation: pulse-glow-gold 2.2s ease-in-out infinite; }
+.animate-spin-slow            { animation: spin-slow 3.5s linear infinite; }
+.animate-blink                { animation: blink-dot 1.4s ease-in-out infinite; }
+.animate-ledger               { animation: ledger-appear 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(52, 211, 153, 0.08), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2.2s ease-in-out infinite;
+}
+
+/* ---- Drop Zone ---- */
+.drop-zone {
+  border: 2px dashed rgba(255, 79, 0, 0.25);
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+}
+.drop-zone:hover,
+.drop-zone.drag-over {
+  border-color: rgba(255, 79, 0, 0.75);
+  background: rgba(255, 79, 0, 0.03);
+  box-shadow: 0 0 40px rgba(255, 79, 0, 0.08), inset 0 0 20px rgba(255, 79, 0, 0.02);
+}
+
+/* ---- Gauge ---- */
+.gauge-circle {
+  transition: stroke-dashoffset 1.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ---- Status Badges ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.badge-success {
+  background: rgba(21, 128, 61, 0.1);
+  color: #16a34a;
+  border: 1px solid rgba(21, 128, 61, 0.2);
+}
+.badge-warning {
+  background: rgba(180, 83, 9, 0.1);
+  color: #d97706;
+  border: 1px solid rgba(180, 83, 9, 0.2);
+}
+.badge-danger {
+  background: rgba(185, 28, 28, 0.1);
+  color: #dc2626;
+  border: 1px solid rgba(185, 28, 28, 0.2);
+}
+.badge-info {
+  background: rgba(47, 42, 38, 0.08);
+  color: #2f2a26;
+  border: 1px solid rgba(47, 42, 38, 0.18);
+}
+.badge-purple {
+  background: rgba(124, 58, 237, 0.1);
+  color: #7c3aed;
+  border: 1px solid rgba(124, 58, 237, 0.2);
+}
+.badge-gold {
+  background: rgba(180, 83, 9, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(180, 83, 9, 0.3);
+  animation: pulse-glow-gold 2.2s ease-in-out infinite;
+}
+
+/* ---- Hex Token ---- */
+.hex-token {
+  font-family: monospace;
+  font-size: 10px;
+  color: #2f2a26;
+  background: rgba(47, 42, 38, 0.04);
+  border: 1px solid rgba(47, 42, 38, 0.12);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  word-break: break-all;
+}
+
+/* ---- Pice Button ---- */
+.pice-btn {
+  position: relative;
+  background: linear-gradient(135deg, #ff4f00, #2f2a26);
+  overflow: hidden;
+  border: none;
+  z-index: 1;
+  box-shadow: 0 4px 14px 0 rgba(255, 79, 0, 0.2);
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+}
+.pice-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(135deg, #e04500, #201515);
+  opacity: 0;
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+.pice-btn:hover::before {
+  opacity: 1;
+}
+.pice-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(255, 79, 0, 0.3);
+}
+.pice-btn:active {
+  transform: translateY(1px);
+}
+
+/* ---- Bounding Boxes Canvas Overlay ---- */
+.scan-overlay {
+  position: relative;
+}
+.scan-overlay::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #ff4f00, transparent);
+  animation: scan-line 3s linear infinite;
+  box-shadow: 0 0 12px #ff4f00;
+}
+
+/* ==========================================================================
+   🌓 DARK THEME FUNCTIONALITY & CLASS OVERRIDES
+   ========================================================================== */
+
+html.dark {
+  --background: #140d0d;      /* Very deep coffee-ink dark base */
+  --foreground: #fffefb;      /* Warm off-white primary text */
+  --card-bg: #201515;         /* Deep coffee-ink for card bg */
+  --card-border: #36342e;     /* Mute/soft dark border */
+  --accent-primary: #ff4f00;  /* Zapier Orange (remains matching) */
+  --accent-secondary: #f8f4f0;/* Cream-soft */
+  --accent-mid: #c5c0b1;      /* Mute/soft tone */
+  --brand-body: #c5c0b1;      /* Light body text in dark mode */
+  --brand-body-mid: #939084;  /* Mid body text */
+  --accent-gradient: linear-gradient(135deg, #ff4f00, #f8f4f0);
+  --glass-bg: rgba(32, 21, 21, 0.85);
+  --glass-border: rgba(255, 254, 251, 0.08);
+  --danger: #ef4444;          /* Vibrant red for dark context */
+  --warning: #f59e0b;         /* Vibrant amber for dark context */
+  --success: #22c55e;         /* Vibrant green for dark context */
+  --pice-gold: #fbbf24;
+}
+
+/* Base Body Override */
+html.dark body {
+  background-color: var(--background) !important;
+  color: var(--brand-body) !important;
+}
+
+/* Background Overrides */
+html.dark .bg-brand-canvas {
+  background-color: var(--background) !important;
+}
+
+html.dark .bg-brand-canvas-soft {
+  background-color: var(--card-bg) !important;
+}
+
+html.dark .bg-brand-canvas\/90 {
+  background-color: rgba(20, 13, 13, 0.9) !important;
+}
+
+html.dark .bg-brand-orange\/\[0\.03\] {
+  background-color: rgba(255, 79, 0, 0.05) !important;
+}
+
+html.dark .bg-brand-ink\/\[0\.02\] {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+html.dark .bg-brand-ink {
+  background-color: #2f2a26 !important;
+}
+
+/* Text Color Overrides */
+html.dark .text-brand-ink {
+  color: var(--foreground) !important;
+}
+
+html.dark .text-brand-ink-soft {
+  color: var(--accent-secondary) !important;
+}
+
+html.dark .text-brand-body {
+  color: var(--brand-body) !important;
+}
+
+html.dark .text-brand-body-mid {
+  color: var(--brand-body-mid) !important;
+}
+
+html.dark .text-brand-canvas {
+  color: var(--foreground) !important;
+}
+
+/* Border Color Overrides */
+html.dark .border-brand-mute,
+html.dark .border-brand-mute\/15,
+html.dark .border-brand-mute\/20,
+html.dark .border-brand-mute\/30,
+html.dark .border-brand-mute\/40,
+html.dark .border-brand-mute\/50 {
+  border-color: var(--card-border) !important;
+}
+
+html.dark .border-brand-ink {
+  border-color: var(--card-border) !important;
+}
+
+/* Glass Card and Badges */
+html.dark .glass-card {
+  background: var(--glass-bg) !important;
+  border-color: var(--glass-border) !important;
+}
+
+html.dark .badge-info {
+  background: rgba(255, 254, 251, 0.08) !important;
+  color: var(--accent-secondary) !important;
+  border-color: rgba(255, 254, 251, 0.18) !important;
+}
+
+html.dark .hex-token {
+  color: var(--accent-secondary) !important;
+  background: rgba(255, 254, 251, 0.04) !important;
+  border-color: rgba(255, 254, 251, 0.12) !important;
+}
+
+/* Input elements inside Login/Register and Dashboard */
+html.dark input,
+html.dark select,
+html.dark textarea {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--card-border) !important;
+}
+
+html.dark input::placeholder {
+  color: var(--brand-body-mid) !important;
+}
+
+/* Tables, headers, cells */
+html.dark table {
+  border-color: var(--card-border) !important;
+}
+
+html.dark th {
+  background-color: var(--card-bg) !important;
+  color: var(--foreground) !important;
+}
+
+html.dark td {
+  border-color: var(--card-border) !important;
+}
+
+/* Footer Section Overrides */
+html.dark footer {
+  background-color: #0c0808 !important;
+  border-color: var(--card-border) !important;
+}
+
+/* Scrollbar adjustment for dark mode */
+html.dark ::-webkit-scrollbar-thumb {
+  background: rgba(255, 79, 0, 0.4) !important;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 79, 0, 0.65) !important;
+}

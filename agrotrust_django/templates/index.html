@@ -1,0 +1,212 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AgroTrust AI — Privacy-First B2B Agricultural Verification{% endblock %}
+
+{% block content %}
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-brand-canvas">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/[0.03] rounded-full blur-[120px] animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-ink/[0.02] rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
+  </div>
+
+  <!-- Warm Grid Pattern Overlay -->
+  <div class="absolute inset-0 opacity-[0.04] z-0" style="background-image: linear-gradient(rgba(32,21,21,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(32,21,21,0.2) 1px, transparent 1px); background-size: 60px 60px;"></div>
+
+  <div class="relative z-10 max-w-5xl mx-auto px-6 text-center py-24">
+    <!-- Verification Status Badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-canvas-soft border border-brand-mute/40 mb-8 animate-fadeInUp">
+      <span class="text-brand-orange text-xs font-black uppercase tracking-wider">🌍 Platform Active</span>
+      <div class="w-1.5 h-1.5 bg-brand-mute rounded-full"></div>
+      <span class="text-brand-body text-xs font-medium">Zero-Trust • Dual AI Inference</span>
+    </div>
+
+    <!-- Main Heading -->
+    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-fadeInUp font-display text-brand-ink leading-tight">
+      <span>Trust Your </span>
+      <span class="text-brand-orange">Supply Chain</span>
+      <br>
+      <span>With </span>
+      <span class="text-brand-ink-soft">AI Precision</span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="text-base sm:text-lg text-brand-body max-w-2xl mx-auto mb-10 animate-fadeInUp-delay-1 leading-relaxed font-sans">
+      Privacy-first crop quality analysis and B2B invoice verification.
+      Empowering growers with transparent, instant quality-score grading and
+      secure automated B2B financial settlements.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fadeInUp-delay-2">
+      <a href="{% url 'core:dashboard' %}" class="group px-8 py-3.5 rounded-xl bg-brand-orange text-brand-canvas font-bold text-sm hover:bg-[#e04500] hover:shadow-lg hover:shadow-brand-orange/20 transition-all duration-300 active:scale-[0.98] flex items-center gap-1.5">
+        <span>Launch Secure Dashboard</span>
+        <span class="inline-block transition-transform duration-200 group-hover:translate-x-1">→</span>
+      </a>
+      <a href="#features" class="px-8 py-3.5 rounded-xl bg-brand-canvas border border-brand-ink text-brand-ink font-bold text-sm hover:bg-brand-canvas-soft transition-all duration-300">
+        How It Works
+      </a>
+    </div>
+
+    <!-- Trust Indicators -->
+    <div class="flex items-center justify-center gap-6 mt-14 animate-fadeInUp-delay-3">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-body-mid">
+        <div class="w-1.5 h-1.5 rounded-full bg-brand-orange shadow-[0_0_6px_rgba(255,79,0,0.5)]"></div>
+        EXIF Stripped
+      </div>
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-body-mid">
+        <div class="w-1.5 h-1.5 rounded-full bg-brand-ink shadow-[0_0_6px_rgba(32,21,21,0.5)]"></div>
+        AES-256 Encrypted
+      </div>
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-brand-body-mid">
+        <div class="w-1.5 h-1.5 rounded-full bg-brand-orange shadow-[0_0_6px_rgba(255,79,0,0.5)]"></div>
+        In-Memory Only
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-24 relative border-t border-brand-mute/25 bg-brand-canvas">
+  <div class="max-w-6xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <span class="text-brand-orange text-xs font-black uppercase tracking-widest block mb-2">Zero-Trust Pipeline</span>
+      <h2 class="text-3xl sm:text-4xl font-bold text-brand-ink font-display tracking-tight mb-4">
+        Privacy-First Data Architecture
+      </h2>
+      <p class="text-brand-body max-w-xl mx-auto font-sans text-sm">
+        Every byte is processed exclusively in dynamic RAM memory and destroyed immediately after verification. Your details never touch a physical disk.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- 01 Card -->
+      <div class="glass-card p-6 border border-brand-mute/40 hover:scale-[1.02] transition-all duration-300 group bg-brand-canvas-soft">
+        <div class="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center text-xs font-black text-brand-orange mb-4 group-hover:scale-110 transition-transform">
+          01
+        </div>
+        <h3 class="text-brand-ink font-bold text-base mb-2 font-display">EXIF Stripping</h3>
+        <p class="text-xs text-brand-body leading-relaxed">GPS coordinates and device identifiers are stripped in-browser before any payload transit.</p>
+      </div>
+
+      <!-- 02 Card -->
+      <div class="glass-card p-6 border border-brand-mute/40 hover:scale-[1.02] transition-all duration-300 group bg-brand-canvas-soft">
+        <div class="w-10 h-10 rounded-xl bg-brand-ink/5 border border-brand-ink/15 flex items-center justify-center text-xs font-black text-brand-ink mb-4 group-hover:scale-110 transition-transform">
+          02
+        </div>
+        <h3 class="text-brand-ink font-bold text-base mb-2 font-display">AES-256 Encryption</h3>
+        <p class="text-xs text-brand-body leading-relaxed">Sensitive metadata and payload attributes are fully encrypted client-side using robust cryptography.</p>
+      </div>
+
+      <!-- 03 Card -->
+      <div class="glass-card p-6 border border-brand-mute/40 hover:scale-[1.02] transition-all duration-300 group bg-brand-canvas-soft">
+        <div class="w-10 h-10 rounded-xl bg-brand-orange/10 border border-brand-orange/20 flex items-center justify-center text-xs font-black text-brand-orange mb-4 group-hover:scale-110 transition-transform">
+          03
+        </div>
+        <h3 class="text-brand-ink font-bold text-base mb-2 font-display">Dual AI Engines</h3>
+        <p class="text-xs text-brand-body leading-relaxed">In-memory YOLOv8 for visual grading and EasyOCR for raw text extraction — loaded directly in server RAM.</p>
+      </div>
+
+      <!-- 04 Card -->
+      <div class="glass-card p-6 border border-brand-mute/40 hover:scale-[1.02] transition-all duration-300 group bg-brand-canvas-soft">
+        <div class="w-10 h-10 rounded-xl bg-brand-ink/5 border border-brand-ink/15 flex items-center justify-center text-xs font-black text-brand-ink mb-4 group-hover:scale-110 transition-transform">
+          04
+        </div>
+        <h3 class="text-brand-ink font-bold text-base mb-2 font-display">B2B Settlement</h3>
+        <p class="text-xs text-brand-body leading-relaxed">Verified quality trust scores automatically trigger instantaneous, audited Pice payout disbursements.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Data Lifecycle Section -->
+<section class="py-24 relative border-t border-brand-mute/25 bg-brand-canvas-soft">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="text-center mb-16">
+      <span class="text-brand-orange text-xs font-black uppercase tracking-widest block mb-2">Audit Ledger</span>
+      <h2 class="text-3xl font-bold text-brand-ink font-display tracking-tight mb-4">
+        Data Lifecycle Matrix
+      </h2>
+      <p class="text-brand-body text-sm">
+        Complete transparency over how your data is handled at every stage of the pipeline.
+      </p>
+    </div>
+
+    <div class="space-y-4">
+      <!-- 01 Row -->
+      <div class="glass-card p-4 flex items-center gap-4 hover:bg-brand-canvas/80 border-brand-mute/30 transition-all bg-brand-canvas">
+        <div class="w-10 h-10 rounded-lg bg-brand-canvas-soft border border-brand-mute flex items-center justify-center text-xs font-bold text-brand-ink shrink-0 font-mono">
+          01
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-brand-ink font-display">Ingestion</p>
+          <p class="text-xs text-brand-body">Strip geographic EXIF metadata</p>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-xs font-mono text-brand-ink font-semibold">Canvas API</p>
+          <p class="text-[10px] text-brand-body-mid font-semibold">Browser Client</p>
+        </div>
+      </div>
+
+      <!-- 02 Row -->
+      <div class="glass-card p-4 flex items-center gap-4 hover:bg-brand-canvas/80 border-brand-mute/30 transition-all bg-brand-canvas">
+        <div class="w-10 h-10 rounded-lg bg-brand-canvas-soft border border-brand-mute flex items-center justify-center text-xs font-bold text-brand-ink shrink-0 font-mono">
+          02
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-brand-ink font-display">Transit</p>
+          <p class="text-xs text-brand-body">AES-256 payload encryption</p>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-xs font-mono text-brand-ink font-semibold">CryptoJS</p>
+          <p class="text-[10px] text-brand-body-mid font-semibold">Network Transit</p>
+        </div>
+      </div>
+
+      <!-- 03 Row -->
+      <div class="glass-card p-4 flex items-center gap-4 hover:bg-brand-canvas/80 border-brand-mute/30 transition-all bg-brand-canvas">
+        <div class="w-10 h-10 rounded-lg bg-brand-canvas-soft border border-brand-mute flex items-center justify-center text-xs font-bold text-brand-ink shrink-0 font-mono">
+          03
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-brand-ink font-display">Inference</p>
+          <p class="text-xs text-brand-body">Dual YOLOv8 & OCR processing</p>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-xs font-mono text-brand-ink font-semibold">BytesIO Stream</p>
+          <p class="text-[10px] text-brand-body-mid font-semibold">RAM Memory</p>
+        </div>
+      </div>
+
+      <!-- 04 Row -->
+      <div class="glass-card p-4 flex items-center gap-4 hover:bg-brand-canvas/80 border-brand-mute/30 transition-all bg-brand-canvas">
+        <div class="w-10 h-10 rounded-lg bg-brand-canvas-soft border border-brand-mute flex items-center justify-center text-xs font-bold text-brand-ink shrink-0 font-mono">
+          04
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-bold text-brand-ink font-display">Cleanup</p>
+          <p class="text-xs text-brand-body">Immediate in-memory byte destruction</p>
+        </div>
+        <div class="text-right shrink-0">
+          <p class="text-xs font-mono text-brand-ink font-semibold">Python GC</p>
+          <p class="text-[10px] text-brand-body-mid font-semibold">Server Runtime</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer Section (Polarity-Flipped Ink Dark) -->
+<footer class="bg-brand-ink text-brand-canvas-soft py-12 relative border-t border-brand-ink-soft">
+  <div class="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+    <p class="text-xs text-brand-mute/80">
+      © 2026 AgroTrust AI — Privacy-First B2B Agricultural Verification. All rights reserved.
+    </p>
+    <div class="flex items-center gap-4 text-xs font-semibold text-brand-mute/80">
+      <span>Zero-Disk RAM Architecture</span>
+      <span>•</span>
+      <span>Lucide Core</span>
+    </div>
+  </div>
+</footer>
+{% endblock %}

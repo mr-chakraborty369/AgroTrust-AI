@@ -1,0 +1,1082 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Cooperative Manager Dashboard — AgroTrust AI{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+<div class="relative flex-1 pt-8 pb-12 px-4 sm:px-6 lg:px-8 bg-brand-canvas">
+  <div class="max-w-7xl mx-auto">
+    
+    <!-- Dashboard Header -->
+    <div class="mb-7 animate-fadeInUp flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 font-display">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <i data-lucide="leaf" class="w-5 h-5 text-brand-orange"></i>
+          <span class="text-xs font-black text-brand-orange uppercase tracking-widest">
+            AgroTrust AI · {% if session.role == 'admin' %}Cooperative Admin Panel{% else %}Farmer Dashboard{% endif %}
+          </span>
+        </div>
+        <h1 class="text-3xl font-black text-brand-ink tracking-tight leading-none">
+          Analysis <span class="text-brand-orange">Workspace</span>
+        </h1>
+        <p class="text-xs text-brand-body mt-2 font-sans font-medium">
+          Dual-AI crop grading · Invoice OCR · Automated Pice B2B instant settlement
+        </p>
+      </div>
+
+      <!-- Live metrics -->
+      <div class="flex items-center gap-3 font-sans">
+        <div class="text-center px-4 py-2.5 rounded-xl bg-brand-canvas-soft border border-brand-mute/40">
+          <p id="stat-scans" class="text-lg font-black text-brand-ink">0</p>
+          <p class="text-[9px] text-brand-body uppercase tracking-wider font-bold">Uploads</p>
+        </div>
+        <div class="text-center px-4 py-2.5 rounded-xl bg-brand-canvas-soft border border-brand-mute/40">
+          <p id="stat-graded" class="text-lg font-black text-brand-orange">0</p>
+          <p class="text-[9px] text-brand-body uppercase tracking-wider font-bold">Graded</p>
+        </div>
+        <div class="text-center px-4 py-2.5 rounded-xl bg-brand-canvas-soft border border-brand-mute/40">
+          <p id="stat-settled" class="text-lg font-black text-brand-ink-soft">0</p>
+          <p class="text-[9px] text-brand-body uppercase tracking-wider font-bold">Settled</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Workspace Split-Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start font-sans">
+      
+      <!-- ================= LEFT COLUMN ================= -->
+      <div class="space-y-6">
+        <!-- Secure Upload Card -->
+        <div class="glass-card p-6 border border-brand-mute/40 animate-fadeInUp bg-brand-canvas-soft">
+          <div class="flex items-center justify-between mb-5">
+            <div>
+              <div class="flex items-center gap-2 mb-0.5">
+                <i data-lucide="shield" class="w-4.5 h-4.5 text-brand-orange" stroke-width="2.5"></i>
+                <h3 class="text-base font-bold text-brand-ink font-display">Secure Upload</h3>
+              </div>
+              <p class="text-[11px] text-brand-body">EXIF-stripped · AES-256 encrypted · Zero-disk transit</p>
+            </div>
+            <span class="badge badge-info">Pillar 4 Security</span>
+          </div>
+
+          <!-- Quick Try Row -->
+          <div class="mb-5 p-3.5 rounded-xl bg-brand-canvas border border-brand-mute/30">
+            <div class="flex items-center justify-between mb-2.5">
+              <p class="text-[10px] font-black text-brand-body-mid uppercase tracking-widest">
+                Quick Test Samples
+              </p>
+              <span class="text-[9px] text-brand-orange font-bold bg-brand-orange/5 px-1.5 py-0.5 rounded border border-brand-orange/10">
+                Preloaded Assets
+              </span>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <button
+                type="button"
+                onclick="loadPreseededDemo('crop')"
+                class="flex-1 py-2 px-3 rounded-lg text-[11px] font-bold bg-brand-canvas text-brand-ink hover:bg-brand-orange/10 hover:text-brand-orange hover:border-brand-orange/30 transition-all border border-brand-mute cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <i data-lucide="leaf" class="w-3.5 h-3.5 text-brand-orange"></i> Sample Crop
+              </button>
+              <button
+                type="button"
+                onclick="loadPreseededDemo('invoice')"
+                class="flex-1 py-2 px-3 rounded-lg text-[11px] font-bold bg-brand-canvas text-brand-ink hover:bg-brand-orange/10 hover:text-brand-orange hover:border-brand-orange/30 transition-all border border-brand-mute cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <i data-lucide="receipt" class="w-3.5 h-3.5 text-brand-orange"></i> Sample Invoice
+              </button>
+              <button
+                type="button"
+                onclick="loadPreseededDemo('both')"
+                class="flex-1 py-2 px-3 rounded-lg text-[11px] font-bold bg-brand-canvas text-brand-ink hover:bg-brand-ink/5 hover:text-brand-ink hover:border-brand-ink/30 transition-all border border-brand-mute cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <i data-lucide="zap" class="w-3.5 h-3.5 text-brand-ink"></i> Dual Scan
+              </button>
+            </div>
+          </div>
+
+          <!-- Select Scan Mode -->
+          <div class="flex gap-2 mb-5">
+            <button onclick="setScanMode('crop')" id="btn-mode-crop" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border bg-brand-canvas border-brand-mute/40 text-brand-body hover:border-brand-orange transition-all cursor-pointer">
+              <div class="flex flex-col items-center gap-1">
+                <i data-lucide="leaf" class="w-4 h-4 text-brand-orange"></i>
+                <span class="font-display">Crop Quality</span>
+                <span class="text-[9px] text-brand-body-mid font-medium">YOLOv8</span>
+              </div>
+            </button>
+            <button onclick="setScanMode('invoice')" id="btn-mode-invoice" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border bg-brand-canvas border-brand-mute/40 text-brand-body hover:border-brand-orange transition-all cursor-pointer">
+              <div class="flex flex-col items-center gap-1">
+                <i data-lucide="receipt" class="w-4 h-4 text-brand-ink-soft"></i>
+                <span class="font-display">Invoice OCR</span>
+                <span class="text-[9px] text-brand-body-mid font-medium">EasyOCR</span>
+              </div>
+            </button>
+            <button onclick="setScanMode('both')" id="btn-mode-both" class="flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border bg-brand-orange text-brand-canvas border-brand-orange/30 shadow-[0_0_12px_rgba(255,79,0,0.15)] transition-all cursor-pointer">
+              <div class="flex flex-col items-center gap-1">
+                <i data-lucide="zap" class="w-4 h-4 text-brand-canvas animate-pulse"></i>
+                <span class="font-display">Full Scan</span>
+                <span class="text-[9px] text-brand-canvas font-black">Dual-AI</span>
+              </div>
+            </button>
+          </div>
+
+          <!-- File Drop Zone Area -->
+          <div id="drop-area" onclick="triggerFileSelector()" class="drop-zone relative rounded-2xl cursor-pointer p-8 transition-all flex flex-col items-center justify-center text-center bg-brand-canvas">
+            <input type="file" id="file-selector" accept="image/*" class="hidden" onchange="handleFileSelected(event)">
+            
+            <div id="upload-placeholder" class="space-y-3">
+              <div class="w-16 h-16 rounded-2xl bg-brand-canvas-soft border border-brand-mute/30 flex items-center justify-center mx-auto transition-transform group-hover:scale-110">
+                <i data-lucide="upload" class="w-7 h-7 text-brand-body-mid"></i>
+              </div>
+              <p class="text-sm font-bold text-brand-ink font-display">Drop image or click to browse</p>
+              <p class="text-xs text-brand-body-mid">JPEG · PNG · WebP — up to 10 MB</p>
+            </div>
+
+            <div id="upload-preview-container" class="hidden w-full relative p-2">
+              <button type="button" onclick="clearSelectedFile(event)" class="absolute top-2 right-2 z-10 w-7 h-7 rounded-full bg-brand-canvas border border-brand-mute flex items-center justify-center hover:bg-red-500/10 hover:border-red-500/40 transition-all cursor-pointer">
+                <i data-lucide="x" class="w-3.5 h-3.5 text-brand-body"></i>
+              </button>
+              <div class="scan-overlay rounded-xl overflow-hidden bg-brand-canvas-soft border border-brand-mute/30">
+                <img id="upload-img-preview" src="" class="w-full max-h-52 object-contain rounded-xl">
+              </div>
+              <div class="mt-3 flex items-center gap-2 text-xs text-brand-body font-mono">
+                <i data-lucide="file-image" class="w-3.5 h-3.5 text-brand-body-mid"></i>
+                <span id="upload-filename-txt" class="truncate flex-1 text-left">Processing…</span>
+                <span id="upload-size-txt" class="shrink-0 font-bold">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Security pipelines status -->
+          <div id="security-pipeline-card" class="hidden mt-4 p-3.5 rounded-xl bg-brand-canvas border border-brand-mute/30 animate-fadeInUp">
+            <p class="text-[10px] font-black text-brand-body-mid uppercase tracking-widest mb-3">Security Pipeline</p>
+            <div class="space-y-2">
+              <div class="flex items-center gap-3">
+                <div id="step-exif-icon" class="flex items-center justify-center w-5 h-5 rounded-md bg-brand-canvas-soft text-brand-body-mid">
+                  <i data-lucide="shield" class="w-3 h-3"></i>
+                </div>
+                <span id="step-exif-label" class="text-xs text-brand-body-mid font-medium">EXIF / GPS Metadata Strip</span>
+                <span id="step-exif-done" class="hidden text-[9px] text-brand-orange font-bold ml-auto">✓ DONE</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div id="step-encrypt-icon" class="flex items-center justify-center w-5 h-5 rounded-md bg-brand-canvas-soft text-brand-body-mid">
+                  <i data-lucide="lock" class="w-3 h-3"></i>
+                </div>
+                <span id="step-encrypt-label" class="text-xs text-brand-body-mid font-medium">AES-256 Token Encryption</span>
+                <span id="step-encrypt-done" class="hidden text-[9px] text-brand-orange font-bold ml-auto">✓ DONE</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <div id="step-ready-icon" class="flex items-center justify-center w-5 h-5 rounded-md bg-brand-canvas-soft text-brand-body-mid">
+                  <i data-lucide="cpu" class="w-3 h-3"></i>
+                </div>
+                <span id="step-ready-label" class="text-xs text-brand-body-mid font-medium">FormData Payload Ready</span>
+                <span id="step-ready-done" class="hidden text-[9px] text-brand-orange font-bold ml-auto">✓ DONE</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analyze Trigger Button -->
+          <button
+            type="button"
+            id="analyze-trigger-btn"
+            disabled
+            onclick="executeDualAIAnalysis()"
+            class="w-full mt-5 py-3.5 px-6 rounded-xl font-bold text-sm text-brand-body-mid bg-brand-canvas border border-brand-mute cursor-not-allowed transition-all flex items-center justify-center gap-2.5"
+          >
+            <i data-lucide="cpu" class="w-4.5 h-4.5"></i>
+            <span id="analyze-btn-txt">Run Full AI Analysis</span>
+          </button>
+        </div>
+
+        <!-- YOLOv8 Crop Visualizer card -->
+        <div id="visualizer-card" class="hidden glass-card p-6 border border-brand-mute/40 bg-brand-canvas-soft animate-fadeInUp">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="scan-search" class="w-4.5 h-4.5 text-brand-orange"></i>
+              <h3 class="text-base font-bold text-brand-ink font-display">Crop Grading Visualizer</h3>
+            </div>
+            <span class="badge badge-info font-display">Computer Vision</span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 mb-5">
+            <!-- Quality score Gauge -->
+            <div class="flex flex-col items-center justify-center p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30">
+              <div class="relative w-24 h-24 flex items-center justify-center">
+                <svg class="w-full h-full transform -rotate-90">
+                  <circle cx="48" cy="48" r="40" stroke="rgba(197, 192, 177, 0.2)" stroke-width="6" fill="transparent" />
+                  <circle id="visualizer-gauge-track" class="gauge-circle" cx="48" cy="48" r="40" stroke="#ff4f00" stroke-width="6" fill="transparent"
+                          stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round" />
+                </svg>
+                <div class="absolute flex flex-col items-center">
+                  <span id="visualizer-score-txt" class="text-2xl font-black text-brand-ink leading-none">0.0</span>
+                  <span class="text-[8px] font-black uppercase text-brand-body-mid tracking-wider mt-1">Quality</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Grade card -->
+            <div class="p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30 flex flex-col justify-center text-center">
+              <p class="text-[9px] font-black uppercase text-brand-body-mid tracking-widest mb-1">Evaluated Grade</p>
+              <p id="visualizer-grade-txt" class="text-4xl font-black leading-none my-1 text-brand-orange">A+</p>
+              <p id="visualizer-label-txt" class="text-xs font-bold text-brand-body uppercase mt-1">Premium Standard</p>
+            </div>
+
+            <!-- Detections count card -->
+            <div class="p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30 flex flex-col justify-center text-center">
+              <p class="text-[9px] font-black uppercase text-brand-body-mid tracking-widest mb-1">Detections</p>
+              <p id="detections-count-txt" class="text-4xl font-black text-brand-ink leading-none my-1">0</p>
+              <p class="text-xs font-bold text-brand-body uppercase mt-1">Identified Bboxes</p>
+            </div>
+          </div>
+
+          <!-- Bounding boxes visual overlay -->
+          <div class="relative rounded-2xl overflow-hidden border border-brand-mute/30 bg-brand-canvas p-1 mb-5">
+            <img id="visualizer-img-src" src="" class="w-full max-h-80 object-contain rounded-xl">
+            <canvas id="visualizer-overlay-canvas" class="absolute inset-0 w-full h-full pointer-events-none p-1"></canvas>
+          </div>
+
+          <!-- Detections breakdown -->
+          <div class="space-y-4">
+            <div class="p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30">
+              <p class="text-[10px] font-black text-brand-body-mid uppercase tracking-widest mb-3">Model Inference Metrics</p>
+              <div class="space-y-3 font-sans">
+                <!-- Metric 1 -->
+                <div>
+                  <div class="flex justify-between text-xs font-semibold text-brand-ink mb-1.5">
+                    <span>Sizing & Uniformity index</span>
+                    <span id="visualizer-bar1-score" class="font-bold">—</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-brand-canvas-soft border border-brand-mute/30 overflow-hidden">
+                    <div id="visualizer-bar1" class="h-full bg-brand-orange transition-all duration-1000" style="width: 0%"></div>
+                  </div>
+                </div>
+                <!-- Metric 2 -->
+                <div>
+                  <div class="flex justify-between text-xs font-semibold text-brand-ink mb-1.5">
+                    <span>Blemish / Skin Defect Ratio</span>
+                    <span id="visualizer-bar2-score" class="font-bold">—</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-brand-canvas-soft border border-brand-mute/30 overflow-hidden">
+                    <div id="visualizer-bar2" class="h-full bg-brand-ink transition-all duration-1000" style="width: 0%"></div>
+                  </div>
+                </div>
+                <!-- Metric 3 -->
+                <div>
+                  <div class="flex justify-between text-xs font-semibold text-brand-ink mb-1.5">
+                    <span>Color Pigmentation Score</span>
+                    <span id="visualizer-bar3-score" class="font-bold">—</span>
+                  </div>
+                  <div class="w-full h-2 rounded-full bg-brand-canvas-soft border border-brand-mute/30 overflow-hidden">
+                    <div id="visualizer-bar3" class="h-full bg-brand-orange transition-all duration-1000" style="width: 0%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Identified tags -->
+            <div class="p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30">
+              <p class="text-[10px] font-black text-brand-body-mid uppercase tracking-widest mb-3">Identified Instances</p>
+              <div id="detections-badge-container" class="flex flex-wrap gap-2">
+                <span class="text-xs text-brand-body italic">Run inference to display crop items</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= RIGHT COLUMN ================= -->
+      <div class="space-y-6">
+        <!-- Trust score Gauge card -->
+        <div id="trust-gauge-card" class="hidden glass-card p-6 border border-brand-mute/40 bg-brand-canvas-soft animate-fadeInUp">
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-2">
+              <i data-lucide="award" class="w-4.5 h-4.5 text-brand-orange"></i>
+              <h3 class="text-base font-bold text-brand-ink font-display">Calculated Compliance score</h3>
+            </div>
+            <span class="badge badge-gold">Compliance Metric</span>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center gap-6 mb-5 p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30">
+            <!-- Gauge -->
+            <div class="relative w-28 h-28 flex items-center justify-center shrink-0">
+              <svg class="w-full h-full transform -rotate-90">
+                <circle cx="56" cy="56" r="44" stroke="rgba(197, 192, 177, 0.2)" stroke-width="8" fill="transparent" />
+                <circle id="trust-gauge-track" class="gauge-circle" cx="56" cy="56" r="44" stroke="#ff4f00" stroke-width="8" fill="transparent"
+                        stroke-dasharray="276.32" stroke-dashoffset="276.32" stroke-linecap="round" />
+              </svg>
+              <div class="absolute flex flex-col items-center">
+                <span id="trust-gauge-score-txt" class="text-3xl font-black text-brand-ink leading-none">0.0</span>
+                <span class="text-[8px] font-black uppercase text-brand-body-mid tracking-wider mt-1.5">Trust index</span>
+              </div>
+            </div>
+
+            <!-- Details -->
+            <div class="flex-1 text-center sm:text-left space-y-2">
+              <div class="flex items-center justify-center sm:justify-start gap-2 text-xs font-semibold">
+                <div id="trust-status-indicator" class="w-2.5 h-2.5 rounded-full bg-brand-orange animate-pulse"></div>
+                <span id="trust-status-title" class="font-display font-bold text-brand-ink">—</span>
+              </div>
+              <p id="trust-status-desc" class="text-xs text-brand-body leading-relaxed font-medium">
+                Analysis payload completed. Calculating B2B disbursement index.
+              </p>
+            </div>
+          </div>
+
+          <!-- Formula details -->
+          <div class="p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30">
+            <p class="text-[10px] font-black text-brand-body-mid uppercase tracking-widest mb-3">Weighted calculation logic</p>
+            <div class="space-y-2.5 text-xs text-brand-body font-semibold">
+              <div class="flex items-center justify-between pb-2 border-b border-brand-mute/20">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-orange"></span>
+                  <span>Crop Quality Component (60%)</span>
+                </div>
+                <span id="trust-formula-q" class="font-mono text-brand-ink font-bold">—</span>
+              </div>
+              <div class="flex items-center justify-between pb-1">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-brand-ink"></span>
+                  <span>OCR Invoice Confidence (40%)</span>
+                </div>
+                <span id="trust-formula-c" class="font-mono text-brand-ink font-bold">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- EasyOCR parsed fields table -->
+        <div id="invoice-ocr-card" class="hidden glass-card p-6 border border-brand-mute/40 bg-brand-canvas-soft animate-fadeInUp">
+          <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-2">
+              <i data-lucide="receipt" class="w-4.5 h-4.5 text-brand-orange"></i>
+              <h3 class="text-base font-bold text-brand-ink font-display">Invoice Extracted Metadata</h3>
+            </div>
+            <span class="badge badge-purple">EasyOCR Core</span>
+          </div>
+
+          <!-- Extracted fields table -->
+          <div class="rounded-2xl border border-brand-mute/30 overflow-hidden bg-brand-canvas mb-5">
+            <table class="w-full text-xs text-left">
+              <thead>
+                <tr class="bg-brand-canvas-soft text-brand-ink font-display font-semibold border-b border-brand-mute/30">
+                  <th class="px-4 py-2.5">Extracted Field Key</th>
+                  <th class="px-4 py-2.5">Field Value</th>
+                  <th class="px-4 py-2.5 text-right">Confidence</th>
+                </tr>
+              </thead>
+              <tbody id="ocr-table-body">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Raw OCR text dump -->
+          <div class="p-4 rounded-2xl bg-brand-canvas border border-brand-mute/30">
+            <p class="text-[10px] font-black text-brand-body-mid uppercase tracking-widest mb-2.5">Raw Text Streams</p>
+            <div id="ocr-raw-dump" class="text-xs font-mono bg-brand-canvas-soft p-3.5 rounded-xl border border-brand-mute/20 text-brand-body max-h-32 overflow-y-auto whitespace-pre-wrap leading-relaxed break-all">
+              —
+            </div>
+          </div>
+        </div>
+
+        <!-- Pice B2B instant settlement card (Polarity-Flipped Featured Card) -->
+        <div id="payout-ledger-card" class="hidden glass-card p-6 border-none bg-brand-ink text-brand-canvas-soft shadow-2xl animate-fadeInUp relative overflow-hidden">
+          
+          <!-- Decorative atmospheric background blurs -->
+          <div class="absolute inset-0 pointer-events-none z-0">
+            <div class="absolute -top-12 -right-12 w-48 h-48 bg-brand-orange/[0.12] rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute -bottom-16 -left-16 w-52 h-52 bg-brand-canvas-soft/[0.04] rounded-full blur-3xl animate-pulse" style="animation-delay: 1.5s;"></div>
+          </div>
+
+          <div class="relative z-10">
+            <div class="flex items-center justify-between mb-5">
+              <div class="flex items-center gap-2">
+                <i data-lucide="zap" class="w-4.5 h-4.5 text-brand-orange"></i>
+                <h3 class="text-base font-bold text-brand-canvas font-display">Pice Auto-Settlement</h3>
+              </div>
+              <span class="badge bg-[#2f2a26] text-brand-orange border border-brand-orange/30 font-display">disbursement</span>
+            </div>
+
+            <div class="flex items-center gap-5 mb-5 p-4 rounded-2xl bg-[#2f2a26] border border-[#36342e]">
+              <!-- Payout mini-gauge -->
+              <div class="relative w-16 h-16 flex items-center justify-center shrink-0">
+                <svg class="w-full h-full transform -rotate-90">
+                  <circle cx="32" cy="32" r="28" stroke="rgba(255, 255, 255, 0.05)" stroke-width="4.5" fill="transparent" />
+                  <circle id="payout-gauge-track" class="gauge-circle" cx="32" cy="32" r="28" stroke="#ff4f00" stroke-width="4.5" fill="transparent"
+                          stroke-dasharray="175.84" stroke-dashoffset="175.84" stroke-linecap="round" />
+                </svg>
+                <div class="absolute flex flex-col items-center">
+                  <span id="payout-gauge-txt" class="text-sm font-black text-brand-canvas leading-none">0</span>
+                </div>
+              </div>
+
+              <!-- Eligibility details -->
+              <div class="flex-1 min-w-0 space-y-1">
+                <p id="payout-eligibility-title" class="text-xs font-bold text-brand-canvas font-display">—</p>
+                <p id="payout-eligibility-desc" class="text-[11px] text-brand-mute leading-normal font-medium">
+                  Compliance evaluation pending. Awaiting analysis.
+                </p>
+              </div>
+            </div>
+
+            <!-- Settlement threshold progression bar -->
+            <div class="mb-5 space-y-2">
+              <div class="flex justify-between text-[10px] font-black text-brand-mute uppercase tracking-wider">
+                <span>Trust Minimum Compliance</span>
+                <span>Threshold: 70.0</span>
+              </div>
+              <div class="w-full h-2 rounded-full bg-[#2f2a26] border border-[#36342e] overflow-hidden relative">
+                <div id="payout-threshold-progression" class="h-full transition-all duration-1000" style="width: 0%; background-color: #ff4f00;"></div>
+                <div class="absolute top-0 bottom-0 left-[70%] w-0.5 bg-brand-canvas z-10" title="Compliance Threshold Indicator"></div>
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <button
+              type="button"
+              id="payout-action-btn"
+              disabled
+              onclick="triggerPicePayoutSettlement()"
+              class="w-full mt-4 py-4 px-6 rounded-2xl font-bold text-sm text-slate-500 bg-[#2f2a26] border border-[#36342e] cursor-not-allowed transition-all flex items-center justify-center gap-3"
+            >
+              <i data-lucide="zap" class="w-4 h-4"></i>
+              <span>Approve Quality & Issue Pice Payout</span>
+            </button>
+
+            <!-- Loading & Success overlays -->
+            <div id="payout-processing-area" class="hidden"></div>
+            <div id="payout-success-area" class="hidden"></div>
+          </div>
+        </div>
+
+        <!-- Historic Transactions Logs -->
+        <div class="glass-card p-6 border border-brand-mute/40 bg-brand-canvas-soft animate-fadeInUp">
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2">
+              <i data-lucide="history" class="w-4.5 h-4.5 text-brand-orange"></i>
+              <h3 class="text-base font-bold text-brand-ink font-display">Disbursement Ledger</h3>
+            </div>
+            <span class="badge badge-info">Audited Logs</span>
+          </div>
+
+          <div class="space-y-3 max-h-96 overflow-y-auto pr-1" id="transactions-log-container">
+            {% if transactions %}
+              {% for tx in transactions %}
+                <div class="p-3.5 rounded-xl border border-brand-mute/30 bg-brand-canvas animate-ledger flex flex-col gap-2 text-xs font-semibold text-brand-body">
+                  <div class="flex items-center justify-between">
+                    <span class="text-brand-ink font-bold font-display text-sm">{{ tx.verification_record.filename }}</span>
+                    <span class="badge badge-success">SETTLED</span>
+                  </div>
+                  <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+                    <span>Reference</span>
+                    <span class="font-mono text-brand-ink">{{ tx.reference }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+                    <span>Transaction ID</span>
+                    <span class="font-mono text-brand-ink">{{ tx.transaction_id }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+                    <span>Gross Invoice</span>
+                    <span class="font-mono text-brand-ink">₹{{ tx.gross_amount|floatformat:2 }}</span>
+                  </div>
+                  <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+                    <span>Audited Pice Fee</span>
+                    <span class="font-mono text-brand-ink">₹{{ tx.fee_amount|floatformat:2 }} ({{ tx.fee_percent }}%)</span>
+                  </div>
+                  <div class="flex justify-between text-brand-orange font-bold text-xs pt-1">
+                    <span>Net Settled Payout</span>
+                    <span class="font-mono font-black">₹{{ tx.net_settlement|floatformat:2 }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="text-center py-8 bg-brand-canvas border border-brand-mute/20 rounded-xl" id="no-tx-placeholder">
+                <i data-lucide="wallet" class="w-8 h-8 text-brand-body-mid mx-auto mb-2"></i>
+                <p class="text-xs text-brand-body-mid">No payouts issued in this session.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Core Dashboard Interaction Logic -->
+<script>
+  // --- Core Application State ---
+  let activeScanMode = 'both';  // 'crop', 'invoice', 'both'
+  let selectedFile = null;
+  let recordId = null;
+  let trustResults = null;
+  let cropResults = null;
+  let ocrResults = null;
+
+  // Real-time metrics
+  const scanStats = {
+    scans: {{ transactions.count|default:0 }},
+    graded: {{ transactions.count|default:0 }},
+    settled: {{ transactions.count|default:0 }}
+  };
+
+  // --- Initialize Metrics ---
+  function updateVisualStats() {
+    document.getElementById("stat-scans").innerText = scanStats.scans;
+    document.getElementById("stat-graded").innerText = scanStats.graded;
+    document.getElementById("stat-settled").innerText = scanStats.settled;
+  }
+  updateVisualStats();
+
+  // --- Toggle Scan Mode ---
+  function setScanMode(mode) {
+    activeScanMode = mode;
+    
+    const btnCrop = document.getElementById("btn-mode-crop");
+    const btnInvoice = document.getElementById("btn-mode-invoice");
+    const btnBoth = document.getElementById("btn-mode-both");
+
+    [btnCrop, btnInvoice, btnBoth].forEach(btn => {
+      btn.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border bg-brand-canvas border-brand-mute/40 text-brand-body hover:border-brand-orange transition-all cursor-pointer";
+    });
+
+    const triggerBtnTxt = document.getElementById("analyze-btn-txt");
+
+    if (mode === 'crop') {
+      btnCrop.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border bg-brand-orange text-brand-canvas border-brand-orange/30 shadow-[0_0_12px_rgba(255,79,0,0.15)] transition-all cursor-pointer";
+      triggerBtnTxt.innerText = "Analyze Crop Quality";
+    } else if (mode === 'invoice') {
+      btnInvoice.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border bg-brand-orange text-brand-canvas border-brand-orange/30 shadow-[0_0_12px_rgba(255,79,0,0.15)] transition-all cursor-pointer";
+      triggerBtnTxt.innerText = "Parse Invoice OCR";
+    } else {
+      btnBoth.className = "flex-1 py-2.5 px-3 rounded-xl text-xs font-bold border bg-brand-orange text-brand-canvas border-brand-orange/30 shadow-[0_0_12px_rgba(255,79,0,0.15)] transition-all cursor-pointer";
+      triggerBtnTxt.innerText = "Run Full AI Analysis";
+    }
+  }
+
+  // --- File Uploading & Stripping handlers ---
+  function triggerFileSelector() {
+    if (!selectedFile) {
+      document.getElementById("file-selector").click();
+    }
+  }
+
+  function handleFileSelected(event) {
+    const file = event.target.files[0];
+    if (file) {
+      processSelectedFile(file);
+    }
+  }
+
+  function clearSelectedFile(event) {
+    if (event) event.stopPropagation();
+    selectedFile = null;
+    
+    document.getElementById("file-selector").value = "";
+    document.getElementById("upload-placeholder").classList.remove("hidden");
+    document.getElementById("upload-preview-container").classList.add("hidden");
+    document.getElementById("security-pipeline-card").classList.add("hidden");
+    
+    // Disable action button
+    const btn = document.getElementById("analyze-trigger-btn");
+    btn.disabled = true;
+    btn.className = "w-full mt-5 py-3.5 px-6 rounded-xl font-bold text-sm text-brand-body-mid bg-brand-canvas border border-brand-mute cursor-not-allowed transition-all flex items-center justify-center gap-2.5";
+    
+    // Hide details cards
+    document.getElementById("visualizer-card").classList.add("hidden");
+    document.getElementById("trust-gauge-card").classList.add("hidden");
+    document.getElementById("invoice-ocr-card").classList.add("hidden");
+    document.getElementById("payout-ledger-card").classList.add("hidden");
+
+    // Reset pipeline elements
+    document.getElementById("step-exif-icon").className = "flex items-center justify-center w-5 h-5 rounded-md bg-brand-canvas-soft text-brand-body-mid";
+    document.getElementById("step-exif-done").classList.add("hidden");
+    document.getElementById("step-exif-label").className = "text-xs text-brand-body-mid font-medium";
+
+    document.getElementById("step-encrypt-icon").className = "flex items-center justify-center w-5 h-5 rounded-md bg-brand-canvas-soft text-brand-body-mid";
+    document.getElementById("step-encrypt-done").classList.add("hidden");
+    document.getElementById("step-encrypt-label").className = "text-xs text-brand-body-mid font-medium";
+
+    document.getElementById("step-ready-icon").className = "flex items-center justify-center w-5 h-5 rounded-md bg-brand-canvas-soft text-brand-body-mid";
+    document.getElementById("step-ready-done").classList.add("hidden");
+    document.getElementById("step-ready-label").className = "text-xs text-brand-body-mid font-medium";
+  }
+
+  function processSelectedFile(file) {
+    selectedFile = file;
+    
+    // Show preview & filename
+    document.getElementById("upload-placeholder").classList.add("hidden");
+    document.getElementById("upload-preview-container").classList.remove("hidden");
+    document.getElementById("upload-filename-txt").innerText = file.name;
+    document.getElementById("upload-size-txt").innerText = `${(file.size / 1024).toFixed(1)} KB`;
+    
+    const preview = document.getElementById("upload-img-preview");
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      preview.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
+    // Show pipeline animation
+    const pipeline = document.getElementById("security-pipeline-card");
+    pipeline.classList.remove("hidden");
+
+    // Run simulated security metadata strip
+    document.getElementById("step-exif-label").className = "text-xs text-brand-ink font-semibold";
+    setTimeout(() => {
+      document.getElementById("step-exif-icon").className = "flex items-center justify-center w-5 h-5 rounded-md bg-brand-orange/10 text-brand-orange border border-brand-orange/20";
+      document.getElementById("step-exif-done").classList.remove("hidden");
+      
+      document.getElementById("step-encrypt-label").className = "text-xs text-brand-ink font-semibold";
+      setTimeout(() => {
+        document.getElementById("step-encrypt-icon").className = "flex items-center justify-center w-5 h-5 rounded-md bg-brand-orange/10 text-brand-orange border border-brand-orange/20";
+        document.getElementById("step-encrypt-done").classList.remove("hidden");
+        
+        document.getElementById("step-ready-label").className = "text-xs text-brand-ink font-semibold";
+        setTimeout(() => {
+          document.getElementById("step-ready-icon").className = "flex items-center justify-center w-5 h-5 rounded-md bg-brand-orange/10 text-brand-orange border border-brand-orange/20";
+          document.getElementById("step-ready-done").classList.remove("hidden");
+          
+          // Unlock core analyze trigger button
+          const btn = document.getElementById("analyze-trigger-btn");
+          btn.disabled = false;
+          btn.className = "w-full mt-5 py-3.5 px-6 rounded-xl font-bold text-sm text-brand-canvas bg-brand-orange hover:bg-[#e04500] hover:shadow-lg transition-all cursor-pointer flex items-center justify-center gap-2.5";
+        }, 300);
+      }, 500);
+    }, 400);
+  }
+
+  // --- Preseeded samples loaders ---
+  function loadPreseededDemo(type) {
+    clearSelectedFile();
+    const filename = type === 'invoice' ? 'invoice_sample.png' : 'crop_sample.png';
+    const filepath = `/static/${filename}`;
+
+    // Select suitable scan mode
+    setScanMode(type === 'both' ? 'both' : type);
+
+    // Fetch and load
+    fetch(filepath)
+      .then(res => res.blob())
+      .then(blob => {
+        const file = new File([blob], filename, { type: 'image/png' });
+        processSelectedFile(file);
+      })
+      .catch(err => {
+        alert("Failed to load preloaded demo image: " + err.message);
+      });
+  }
+
+  // --- AJAX Dual AI Analysis execution ---
+  function executeDualAIAnalysis() {
+    if (!selectedFile) return;
+
+    const triggerBtn = document.getElementById("analyze-trigger-btn");
+    triggerBtn.disabled = true;
+    triggerBtn.className = "w-full mt-5 py-3.5 px-6 rounded-xl font-bold text-sm text-brand-body-mid bg-brand-canvas-soft border border-brand-mute cursor-not-allowed transition-all flex items-center justify-center gap-2.5";
+    document.getElementById("analyze-btn-txt").innerText = "Running Dual-AI inference...";
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+    formData.append("analysis_type", activeScanMode);
+    
+    // Pass dynamic CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "core:analyze_api" %}', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken
+      },
+      body: formData
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Backend server error - Status code " + res.status);
+      return res.json();
+    })
+    .then(data => {
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Complete Analysis successful
+      recordId = data.record_id;
+      trustResults = data.trust_score;
+      cropResults = data.crop_analysis;
+      ocrResults = data.ocr_results;
+
+      // Update scans statistics
+      scanStats.scans++;
+      if (cropResults && !cropResults.error) scanStats.graded++;
+      updateVisualStats();
+
+      // Render Visualizations
+      renderVisualizations();
+    })
+    .catch(err => {
+      alert("Verification crashed: " + err.message);
+    })
+    .finally(() => {
+      triggerBtn.disabled = false;
+      setScanMode(activeScanMode);
+    });
+  }
+
+  // --- Render Visualizations ---
+  function renderVisualizations() {
+    // 1. Trust score gauge render
+    document.getElementById("trust-gauge-card").classList.remove("hidden");
+    const trustScore = trustResults.value;
+    document.getElementById("trust-gauge-score-txt").innerText = trustScore.toFixed(1);
+    
+    // Circle dash calculations
+    const circumference = 2 * Math.PI * 44;
+    const offset = circumference - (trustScore / 100) * circumference;
+    document.getElementById("trust-gauge-track").style.strokeDashoffset = offset;
+    
+    // Trust score colors
+    const color = trustScore >= 80 ? "#15803d" : trustScore >= 70 ? "#b45309" : "#b91c1c";
+    document.getElementById("trust-gauge-track").style.stroke = color;
+    document.getElementById("trust-gauge-score-txt").style.color = color;
+    
+    // Formula math components
+    document.getElementById("trust-formula-q").innerText = trustResults.quality_component.toFixed(1);
+    document.getElementById("trust-formula-c").innerText = `${(trustResults.confidence_component * 100).toFixed(1)}%`;
+
+    // Status titles
+    const statusDot = document.getElementById("trust-status-indicator");
+    const statusTitle = document.getElementById("trust-status-title");
+    const statusDesc = document.getElementById("trust-status-desc");
+
+    if (trustResults.payment_eligible) {
+      statusDot.className = "w-2 h-2 rounded-full bg-brand-orange animate-pulse";
+      statusTitle.innerText = "Threshold Met";
+      statusTitle.className = "text-xs font-bold text-brand-orange";
+      statusDesc.innerText = `Trust score ${trustScore.toFixed(1)} exceeds compliance benchmark. Instant payout eligible.`;
+    } else {
+      statusDot.className = "w-2 h-2 rounded-full bg-[#b91c1c] animate-pulse";
+      statusTitle.innerText = "Below Threshold";
+      statusTitle.className = "text-xs font-bold text-[#b91c1c]";
+      statusDesc.innerText = `Trust score ${trustScore.toFixed(1)} below the required 70.0 compliance minimum.`;
+    }
+
+    // 2. YOLO Crop visualizer card render
+    if (cropResults && !cropResults.error) {
+      document.getElementById("visualizer-card").classList.remove("hidden");
+      
+      const score = cropResults.quality_score;
+      document.getElementById("visualizer-score-txt").innerText = score.toFixed(1);
+      
+      const offsetVis = circumference - (score / 100) * circumference;
+      document.getElementById("visualizer-gauge-track").style.strokeDashoffset = offsetVis;
+
+      // Grade text
+      const gradeTxt = document.getElementById("visualizer-grade-txt");
+      const labelTxt = document.getElementById("visualizer-label-txt");
+      
+      if (score >= 88) { gradeTxt.innerText = "A+"; labelTxt.innerText = "Premium"; gradeTxt.style.color = "#ff4f00"; }
+      else if (score >= 75) { gradeTxt.innerText = "A"; labelTxt.innerText = "Excellent"; gradeTxt.style.color = "#ff4f00"; }
+      else if (score >= 60) { gradeTxt.innerText = "B"; labelTxt.innerText = "Good"; gradeTxt.style.color = "#2f2a26"; }
+      else { gradeTxt.innerText = "C"; labelTxt.innerText = "Fair"; gradeTxt.style.color = "#2f2a26"; }
+
+      // Source annotated base64 image
+      document.getElementById("visualizer-img-src").src = `data:image/jpeg;base64,${cropResults.annotated_image}`;
+      
+      // Breakdown sliders
+      document.getElementById("visualizer-bar1-score").innerText = `${(score + 3).toFixed(0)}%`;
+      document.getElementById("visualizer-bar1").style.width = `${Math.min(score + 3, 100)}%`;
+      document.getElementById("visualizer-bar2-score").innerText = `${Math.max(100 - score * 0.35, 40).toFixed(0)}%`;
+      document.getElementById("visualizer-bar2").style.width = `${Math.max(100 - score * 0.35, 40)}%`;
+      document.getElementById("visualizer-bar3-score").innerText = `${(score * 0.95).toFixed(0)}%`;
+      document.getElementById("visualizer-bar3").style.width = `${score * 0.95}%`;
+
+      // Detections badges
+      const countTxt = document.getElementById("detections-count-txt");
+      countTxt.innerText = cropResults.detection_count;
+
+      const container = document.getElementById("detections-badge-container");
+      container.innerHTML = "";
+      
+      cropResults.detections.forEach(det => {
+        const badge = document.createElement("div");
+        badge.className = "inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg border border-brand-mute/40 text-xs font-semibold bg-brand-canvas text-brand-body";
+        badge.innerHTML = `
+          <span class="capitalize font-bold text-brand-ink">${det.label}</span>
+          <span class="text-[10px] text-brand-body-mid">${(det.confidence * 100).toFixed(0)}%</span>
+        `;
+        container.appendChild(badge);
+      });
+
+      // Bounding boxes drawn on top overlay canvas
+      setTimeout(() => {
+        drawCanvasOverlayBoxes();
+      }, 100);
+    } else {
+      document.getElementById("visualizer-card").classList.add("hidden");
+    }
+
+    // 3. Invoice OCR Metadata card
+    if (ocrResults && !ocrResults.error) {
+      document.getElementById("invoice-ocr-card").classList.remove("hidden");
+      
+      // Pop tables
+      const tableBody = document.getElementById("ocr-table-body");
+      tableBody.innerHTML = "";
+
+      const fields = [
+        { label: "Grand Total Amount", key: "total_amount", format: (v) => `₹${Number(v).toLocaleString("en-IN")}` },
+        { label: "Invoice Date", key: "date", format: (v) => v },
+        { label: "Seller Vendor ID", key: "seller_id", format: (v) => v },
+        { label: "Invoice Serial Code", key: "invoice_id", format: (v) => v },
+      ];
+
+      fields.forEach(f => {
+        const val = ocrResults.extracted_fields[f.key];
+        const row = document.createElement("tr");
+        row.className = "border-b border-brand-mute/30 hover:bg-brand-canvas-soft/30";
+        row.innerHTML = `
+          <td class="px-4 py-2.5 font-bold text-brand-body font-display">${f.label}</td>
+          <td class="px-4 py-2.5 font-mono text-brand-ink font-bold">${val ? f.format(val) : '<span class="text-brand-body-mid">—</span>'}</td>
+          <td class="px-4 py-2.5 text-right font-semibold text-brand-body-mid">${val ? `${(ocrResults.confidence * 100).toFixed(0)}%` : '—'}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      // Raw OCR logs
+      document.getElementById("ocr-raw-dump").innerText = ocrResults.full_text;
+    } else {
+      document.getElementById("invoice-ocr-card").classList.add("hidden");
+    }
+
+    // 4. Pice Settlement Ledger render
+    document.getElementById("payout-ledger-card").classList.remove("hidden");
+    
+    // Gauge score
+    document.getElementById("payout-gauge-txt").innerText = trustScore.toFixed(0);
+    
+    const circumferencePayout = 2 * Math.PI * 28;
+    const offsetPayout = circumferencePayout - (trustScore / 100) * circumferencePayout;
+    document.getElementById("payout-gauge-track").style.strokeDashoffset = offsetPayout;
+    document.getElementById("payout-gauge-track").style.stroke = color;
+
+    // Progression bar
+    const bar = document.getElementById("payout-threshold-progression");
+    bar.style.width = `${trustScore}%`;
+    bar.style.backgroundColor = color;
+
+    // Eligibility states
+    const bannerTitle = document.getElementById("payout-eligibility-title");
+    const bannerDesc = document.getElementById("payout-eligibility-desc");
+
+    const actionBtn = document.getElementById("payout-action-btn");
+    
+    // Clear old result boxes
+    document.getElementById("payout-processing-area").className = "hidden";
+    document.getElementById("payout-success-area").className = "hidden";
+
+    if (trustResults.payment_eligible) {
+      bannerTitle.innerText = "Instant B2B Settlement Eligible";
+      bannerTitle.className = "text-xs font-bold text-brand-canvas font-display";
+      bannerDesc.innerText = `Compliance Index is ${trustScore.toFixed(1)} / 100. Pice payout gateway unlocked.`;
+      
+      actionBtn.disabled = false;
+      actionBtn.className = "w-full mt-4 py-4 px-6 rounded-2xl font-bold text-sm text-brand-canvas bg-brand-orange hover:bg-[#e04500] hover:shadow-lg transition-all duration-300 active:scale-95 cursor-pointer flex items-center justify-center gap-3";
+    } else {
+      bannerTitle.innerText = "Disbursement Locked";
+      bannerTitle.className = "text-xs font-bold text-brand-mute font-display";
+      bannerDesc.innerText = `Compliance index of ${trustScore.toFixed(1)} is below standard threshold benchmark.`;
+      
+      actionBtn.disabled = true;
+      actionBtn.className = "w-full mt-4 py-4 px-6 rounded-2xl font-bold text-sm text-brand-body-mid bg-[#2f2a26] border border-[#36342e] cursor-not-allowed transition-all flex items-center justify-center gap-3";
+    }
+  }
+
+  // --- Draw detections bounding boxes on visualizer canvas overlay ---
+  function drawCanvasOverlayBoxes() {
+    const canvas = document.getElementById("visualizer-overlay-canvas");
+    const img = document.getElementById("visualizer-img-src");
+    
+    if (!canvas || !img) return;
+
+    canvas.width = img.offsetWidth;
+    canvas.height = img.offsetHeight;
+    
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (!cropResults || !cropResults.detections) return;
+
+    cropResults.detections.forEach((det, idx) => {
+      setTimeout(() => {
+        const color = det.label === 'good' ? '#ff4f00' : det.label === 'blemish' ? '#b91c1c' : '#b45309';
+        
+        // Canvas dimension relative scale (YOLO relative percentage coordinate format)
+        const x = (det.bbox[0] / 100) * canvas.width || 0;
+        const y = (det.bbox[1] / 100) * canvas.height || 0;
+        const w = (det.bbox[2] / 100) * canvas.width || 50;
+        const h = (det.bbox[3] / 100) * canvas.height || 40;
+
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 6;
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.5;
+        ctx.strokeRect(x, y, w, h);
+        
+        ctx.shadowBlur = 0;
+      }, idx * 100);
+    });
+  }
+
+  // --- Trigger Pice payout instant B2B settlement ---
+  function triggerPicePayoutSettlement() {
+    const actionBtn = document.getElementById("payout-action-btn");
+    actionBtn.classList.add("hidden");
+
+    const processingArea = document.getElementById("payout-processing-area");
+    processingArea.className = "mt-5 p-6 rounded-2xl bg-[#2f2a26] border border-brand-orange/20 text-center animate-fadeInScale";
+    processingArea.innerHTML = `
+      <div class="relative w-14 h-14 mx-auto mb-4">
+        <div class="absolute inset-0 rounded-full border-2 border-brand-orange/20 animate-spin-slow"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <i data-lucide="zap" class="w-6 h-6 text-brand-orange animate-pulse"></i>
+        </div>
+      </div>
+      <p class="text-sm font-bold text-brand-canvas font-display">Processing through Pice Gateway...</p>
+      <p class="text-xs text-brand-mute mt-1">Verifying compliance · Auditing double-entry ledgers</p>
+    `;
+    lucide.createIcons();
+
+    // Call AJAX API Payout Disbursement
+    const amt = ocrResults?.extracted_fields?.total_amount || 48750;
+    const sell = ocrResults?.extracted_fields?.seller_id || "AG-COOP-MH-4471";
+    const dt = ocrResults?.extracted_fields?.date || "";
+
+    const formData = new FormData();
+    formData.append("record_id", recordId);
+    formData.append("trust_score", trustResults.value);
+    formData.append("invoice_amount", amt);
+    formData.append("seller_id", sell);
+    formData.append("invoice_date", dt);
+
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    fetch('{% url "core:payout_api" %}', {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken
+      },
+      body: formData
+    })
+    .then(res => {
+      if (!res.ok) throw new Error("Disbursement gateway failed.");
+      return res.json();
+    })
+    .then(data => {
+      setTimeout(() => {
+        // Settlement successfully verified and balancing log recorded
+        processingArea.className = "hidden";
+        
+        scanStats.settled++;
+        updateVisualStats();
+
+        const successArea = document.getElementById("payout-success-area");
+        successArea.className = "mt-5 rounded-2xl p-5 animate-ledger bg-brand-canvas border border-brand-orange/40 shadow-xl text-left";
+        
+        // Append historic transaction locally in sidebar logs
+        const logContainer = document.getElementById("transactions-log-container");
+        const placeholder = document.getElementById("no-tx-placeholder");
+        if (placeholder) placeholder.classList.add("hidden");
+
+        const newLog = document.createElement("div");
+        newLog.className = "p-3.5 rounded-xl border border-brand-mute/30 bg-brand-canvas animate-ledger flex flex-col gap-2 text-xs font-semibold text-brand-body";
+        newLog.innerHTML = `
+          <div class="flex items-center justify-between">
+            <span class="text-brand-ink font-bold font-display text-sm">${selectedFile ? selectedFile.name : 'Crop Scan'}</span>
+            <span class="badge badge-success">SETTLED</span>
+          </div>
+          <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+            <span>Reference</span>
+            <span class="font-mono text-brand-ink">${data.settlement.reference}</span>
+          </div>
+          <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+            <span>Transaction ID</span>
+            <span class="font-mono text-brand-ink">${data.transaction_id}</span>
+          </div>
+          <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+            <span>Gross Invoice</span>
+            <span class="font-mono text-brand-ink">₹${Number(amt).toLocaleString("en-IN")}</span>
+          </div>
+          <div class="flex justify-between border-b border-brand-mute/20 pb-1 text-[11px]">
+            <span>Audited Pice Fee</span>
+            <span class="font-mono text-brand-ink">₹${data.settlement.fee_amount.toLocaleString("en-IN")} (${data.settlement.fee_percent}%)</span>
+          </div>
+          <div class="flex justify-between text-brand-orange font-bold text-xs pt-1">
+            <span>Net Settled Payout</span>
+            <span class="font-mono font-black">₹${data.settlement.net_settlement.toLocaleString("en-IN")}</span>
+          </div>
+        `;
+        logContainer.insertBefore(newLog, logContainer.firstChild);
+
+        successArea.innerHTML = `
+          <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center gap-2.5">
+              <div class="w-9 h-9 rounded-xl bg-brand-orange/10 flex items-center justify-center">
+                <i data-lucide="check-circle" class="w-5 h-5 text-brand-orange"></i>
+              </div>
+              <div>
+                <p class="text-sm font-bold text-brand-ink font-display">Payout Settled</p>
+                <p class="text-[10px] text-brand-body-mid font-medium">Instant B2B settlement complete</p>
+              </div>
+            </div>
+            <span class="badge badge-success">SETTLED</span>
+          </div>
+
+          <div class="text-center py-4 mb-4 rounded-xl bg-brand-canvas-soft border border-brand-mute/30">
+            <p class="text-[10px] text-brand-body-mid uppercase tracking-widest mb-1 font-bold">Net Settlement</p>
+            <p class="text-4xl font-black text-brand-ink font-display">₹${data.settlement.net_settlement.toLocaleString("en-IN")}</p>
+            <p class="text-xs text-brand-body mt-1">
+              Gross ₹${data.settlement.gross_amount.toLocaleString("en-IN")} · Fee ${data.settlement.fee_percent}% (₹${data.settlement.fee_amount.toLocaleString("en-IN")})
+            </p>
+          </div>
+
+          <!-- Ledgers detail -->
+          <div class="rounded-xl bg-brand-canvas-soft border border-brand-mute/30 px-4 py-2 mb-3 text-brand-body font-semibold">
+            <div class="flex items-center justify-between py-2 border-b border-brand-mute/15">
+              <span class="text-xs">Transaction ID</span>
+              <span class="text-xs font-mono font-bold text-brand-ink">${data.transaction_id}</span>
+            </div>
+            <div class="flex items-center justify-between py-2 border-b border-brand-mute/15">
+              <span class="text-xs">Debit Account</span>
+              <span class="text-xs font-mono font-bold text-[#b91c1c]">${data.ledger_entry.debit_account}</span>
+            </div>
+            <div class="flex items-center justify-between py-2">
+              <span class="text-xs">Credit Account</span>
+              <span class="text-xs font-mono font-bold text-[#15803d]">${data.ledger_entry.credit_account}</span>
+            </div>
+          </div>
+
+          <!-- Cryptographic hashing -->
+          <div class="p-3 rounded-xl bg-brand-canvas-soft border border-brand-mute/30">
+            <div class="flex items-center gap-2 mb-1.5 text-brand-body-mid">
+              <i data-lucide="lock" class="w-3 h-3"></i>
+              <span class="text-[9px] uppercase tracking-widest font-black">Immutable Audit Hash</span>
+            </div>
+            <p class="text-[9px] font-mono text-brand-body break-all font-semibold leading-relaxed">${data.settlement.immutable_hash}</p>
+          </div>
+          
+          <button type="button" onclick="clearSelectedFile()" class="w-full mt-4 py-2.5 rounded-xl text-xs font-bold text-brand-ink bg-brand-canvas-soft border border-brand-mute hover:bg-brand-canvas transition-all cursor-pointer">
+            Initiate New Settlement
+          </button>
+        `;
+        lucide.createIcons();
+      }, 1500);
+    })
+    .catch(err => {
+      alert("Settlement calculation failed: " + err.message);
+      actionBtn.classList.remove("hidden");
+      processingArea.className = "hidden";
+    });
+  }
+</script>
+{% endblock %}

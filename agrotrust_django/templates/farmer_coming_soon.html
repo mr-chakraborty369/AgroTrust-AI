@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Farmer Portal — Coming Soon!{% endblock %}
+
+{% block content %}
+<div class="relative min-h-screen bg-brand-canvas flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+  <div class="absolute inset-0 z-0">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-brand-orange/[0.03] rounded-full blur-[120px] animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-brand-ink/[0.02] rounded-full blur-[100px] animate-pulse" style="animation-delay: 1s;"></div>
+  </div>
+
+  <div class="relative z-10 w-full max-w-lg animate-fadeInUp">
+    <!-- Brand Header -->
+    <div class="flex flex-col items-center mb-6">
+      <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-orange to-brand-ink flex items-center justify-center shadow-lg shadow-brand-orange/20 mb-3 animate-spin-slow">
+        <i data-lucide="sprout" class="w-6 h-6 text-white" stroke-width="2.5"></i>
+      </div>
+      <span class="text-[9px] font-black text-brand-orange bg-brand-orange/10 px-2.5 py-1 rounded-full border border-brand-orange/20 uppercase tracking-widest mb-4">
+        ✨ Under Development
+      </span>
+      <h2 class="text-3xl font-bold text-brand-ink tracking-tight font-display text-center">
+        Farmer Portal
+      </h2>
+      <p class="text-xs text-brand-body mt-1 uppercase tracking-widest font-black text-center">
+        Direct Crop Quality grading & Settlements
+      </p>
+    </div>
+
+    <!-- Coming Soon Glass Card -->
+    <div class="glass-card p-8 border border-brand-mute/40 shadow-2xl relative bg-brand-canvas-soft text-center">
+      <div class="mb-6 flex justify-center">
+        <div class="relative w-16 h-16 rounded-full bg-brand-orange/5 border border-brand-orange/15 flex items-center justify-center text-brand-orange animate-pulse">
+          <i data-lucide="clock" class="w-8 h-8" stroke-width="2"></i>
+        </div>
+      </div>
+
+      <h3 class="text-xl font-bold text-brand-ink font-display mb-3">
+        Opening Soon for Growers
+      </h3>
+      <p class="text-xs text-brand-body leading-relaxed mb-6 font-sans">
+        We are actively preparing the secure, client-side AgroTrust Farmer Portal. Smallholders will soon be able to perform EXIF-sanitized crop scans, check automated YOLOv8 quality grades, and claim direct payouts from co-ops.
+      </p>
+
+      <!-- Simulated Newsletter subscription -->
+      <form onsubmit="event.preventDefault(); showSubscriptionSuccess();" id="newsletter-form" class="space-y-3 mb-6">
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <i data-lucide="mail" class="h-4.5 w-4.5 text-brand-body-mid"></i>
+          </span>
+          <input type="email" id="newsletter-email" placeholder="Enter your email for early access" required class="block w-full pl-10 pr-3 py-3 rounded-xl bg-brand-canvas border border-brand-mute text-brand-ink text-xs focus:outline-none focus:border-brand-orange focus:ring-1 focus:ring-brand-orange/20 transition-all">
+        </div>
+        <button type="submit" class="w-full py-3 px-6 rounded-xl font-bold text-xs text-brand-canvas bg-brand-orange hover:bg-[#e04500] hover:shadow-lg transition-all duration-350 cursor-pointer flex items-center justify-center gap-2">
+          <span>Notify Me at Launch</span>
+          <i data-lucide="bell" class="w-4 h-4"></i>
+        </button>
+      </form>
+
+      <!-- Success subscription banner -->
+      <div id="subscription-success" class="hidden p-3.5 rounded-xl bg-emerald-500/5 border border-emerald-500/25 text-emerald-700 text-xs font-bold animate-fadeInScale mb-6 flex items-center justify-center gap-2">
+        <i data-lucide="check-circle" class="w-4.5 h-4.5 text-emerald-600 shrink-0"></i>
+        <span>Thank you! We'll notify you as soon as early access opens.</span>
+      </div>
+
+      <!-- Trust highlights -->
+      <div class="grid grid-cols-3 gap-4 pt-6 border-t border-brand-mute/30 mb-6">
+        <div class="text-center">
+          <p class="text-xs font-black text-brand-ink">EXIF</p>
+          <p class="text-[9px] text-brand-body-mid uppercase font-bold tracking-wider mt-0.5">Stripped</p>
+        </div>
+        <div class="text-center">
+          <p class="text-xs font-black text-brand-ink">AES-256</p>
+          <p class="text-[9px] text-brand-body-mid uppercase font-bold tracking-wider mt-0.5">Encrypted</p>
+        </div>
+        <div class="text-center">
+          <p class="text-xs font-black text-brand-ink">100%</p>
+          <p class="text-[9px] text-brand-body-mid uppercase font-bold tracking-wider mt-0.5">In-Memory</p>
+        </div>
+      </div>
+
+      <!-- Back CTA link -->
+      <div class="pt-2 text-center border-t border-brand-mute/15">
+        <a href="{% url 'core:login' %}" class="text-[10px] font-bold text-brand-body hover:text-brand-orange transition-colors flex items-center justify-center gap-1">
+          <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Portal Selection
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function showSubscriptionSuccess() {
+    document.getElementById("newsletter-form").classList.add("hidden");
+    document.getElementById("subscription-success").classList.remove("hidden");
+  }
+</script>
+{% endblock %}

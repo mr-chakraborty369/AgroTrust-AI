@@ -1,0 +1,174 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" class="h-full antialiased">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AgroTrust AI — Privacy-First Agricultural Verification{% endblock %}</title>
+  
+  <!-- Theme Initialization (Prevents FOUC) -->
+  <script>
+    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  </script>
+
+  <!-- Global SEO & Styles -->
+  <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Outfit:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              orange: '#ff4f00',
+              ink: '#201515',
+              'ink-soft': '#2f2a26',
+              'ink-mid': '#36342e',
+              body: '#605d52',
+              'body-mid': '#939084',
+              mute: '#c5c0b1',
+              canvas: '#fffefb',
+              'canvas-soft': '#f8f4f0',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            display: ['Outfit', 'Inter', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Global AgroTrust CSS variables & animations -->
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="min-h-full flex flex-col bg-brand-canvas text-brand-body font-sans selection:bg-brand-orange/20 selection:text-brand-ink">
+  
+  <!-- Floating Atmospheric Effects -->
+  <div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+    <div class="absolute top-1/4 -left-32 w-96 h-96 bg-brand-orange/[0.03] rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-brand-ink/[0.02] rounded-full blur-[100px]"></div>
+  </div>
+
+  <!-- Header Section -->
+  <nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-500 bg-brand-canvas/90 backdrop-blur-xl border-b border-brand-mute/15">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        
+        <!-- Logo -->
+        <a href="{% url 'core:home' %}" class="flex items-center gap-3 group z-10 font-display">
+          <div class="relative w-9 h-9 rounded-xl bg-gradient-to-br from-brand-orange to-brand-ink flex items-center justify-center shadow-lg shadow-brand-orange/20 transition-all duration-300 group-hover:scale-110 group-hover:rotate-3">
+            <i data-lucide="leaf" class="w-5 h-5 text-white" stroke-width="2.5"></i>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-base font-bold text-brand-ink tracking-tight leading-none">AgroTrust AI</span>
+            <span class="text-[9px] text-brand-body font-medium tracking-widest uppercase leading-none mt-0.5">B2B Agri-FinTech Suite</span>
+          </div>
+        </a>
+
+        <!-- Center Nav -->
+        <div class="hidden sm:flex items-center gap-1 z-10">
+          <a href="{% url 'core:home' %}" class="px-4 py-2 rounded-lg text-sm font-semibold text-brand-body hover:text-brand-ink hover:bg-brand-canvas-soft transition-all duration-200">Home</a>
+          <a href="{% url 'core:dashboard' %}" class="px-4 py-2 rounded-lg text-sm font-semibold text-brand-body hover:text-brand-ink hover:bg-brand-canvas-soft transition-all duration-200">Dashboard</a>
+        </div>
+
+        <!-- Right: Session controls -->
+        <div class="flex items-center gap-2 z-10">
+          <!-- Active API Status -->
+          <div class="flex items-center gap-2 px-3 py-1.5 rounded-full border bg-brand-canvas-soft border-brand-mute/30">
+            <div class="relative">
+              <div class="w-2 h-2 rounded-full bg-brand-orange shadow-[0_0_8px_rgba(255,79,0,0.7)] animate-pulse-glow"></div>
+            </div>
+            <span class="text-xs font-semibold text-brand-body">AI Online</span>
+            <i data-lucide="wifi" class="w-3 h-3 text-brand-orange"></i>
+          </div>
+
+          <!-- Theme Toggle Switch -->
+          <button id="theme-toggle" class="p-2 rounded-xl bg-brand-canvas-soft border border-brand-mute/30 text-brand-body hover:text-brand-orange hover:bg-brand-canvas transition-all duration-300 flex items-center justify-center cursor-pointer" aria-label="Toggle Dark Mode">
+            <i data-lucide="sun" class="w-4 h-4 hidden dark:block text-brand-orange"></i>
+            <i data-lucide="moon" class="w-4 h-4 block dark:hidden"></i>
+          </button>
+
+          <div class="w-px h-6 bg-brand-mute/30 hidden md:block"></div>
+
+          <!-- Dynamic User Account Session controls -->
+          {% if request.user.is_authenticated %}
+            <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-brand-canvas-soft border border-brand-mute/30 text-xs font-semibold text-brand-ink">
+              <div class="w-2 h-2 rounded-full bg-brand-orange"></div>
+              <span class="truncate max-w-[120px]">{{ request.user.first_name|default:request.user.username }}</span>
+              <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-brand-orange/10 text-brand-orange border border-brand-orange/20">
+                {% if request.user.profile.role == 'admin' %}Admin{% else %}Farmer{% endif %}
+              </span>
+            </div>
+
+            {% if request.user.profile.role == 'admin' %}
+              <a href="/admin/" target="_blank" title="Django In-built Admin Panel" class="hidden sm:flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-brand-canvas-soft border border-brand-mute/30 text-xs font-bold text-brand-ink hover:text-brand-orange hover:bg-brand-canvas transition-all duration-300">
+                <i data-lucide="settings" class="w-3.5 h-3.5"></i>
+                <span>Django Admin</span>
+              </a>
+            {% endif %}
+
+            <a href="{% url 'core:dashboard' %}" class="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-orange text-brand-canvas text-sm font-bold hover:bg-[#e04500] hover:shadow-lg transition-all duration-300 active:scale-95">
+              <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+              <span>Dashboard</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </a>
+
+            <a href="{% url 'core:logout' %}" title="Log Out" class="p-2 rounded-xl bg-brand-canvas-soft border border-brand-mute/40 text-brand-body hover:text-[#b91c1c] hover:bg-red-500/10 hover:border-[#b91c1c]/30 transition-all">
+              <i data-lucide="log-out" class="w-4 h-4"></i>
+            </a>
+          {% else %}
+            <a href="{% url 'core:login' %}" class="hidden sm:flex items-center gap-1.5 px-4 py-2 rounded-xl bg-brand-orange text-brand-canvas text-sm font-bold hover:bg-[#e04500] hover:shadow-lg transition-all duration-300 active:scale-95">
+              <span>Sign In</span>
+              <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content Space -->
+  <main class="flex-1 flex flex-col pt-16 relative z-10">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Lucide icons activator & theme toggle -->
+  <script>
+    lucide.createIcons();
+
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    if (themeToggleBtn) {
+      themeToggleBtn.addEventListener('click', () => {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('theme', 'dark');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
