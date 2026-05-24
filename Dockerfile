@@ -26,15 +26,18 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application files
 COPY . /app/
 
-# Create the media directory and staticfiles directory inside Django folder
-RUN mkdir -p /app/agrotrust_django/media /app/agrotrust_django/staticfiles /app/agrotrust_django/static
+# Change working directory to the Django project folder
+WORKDIR /app/agrotrust_django
+
+# Create the media, staticfiles, and static directories
+RUN mkdir -p media staticfiles static
 
 # Run collectstatic to prepare all static assets (served cleanly via WhiteNoise)
-RUN python /app/agrotrust_django/manage.py collectstatic --noinput
+RUN python manage.py collectstatic --noinput
 
 # Expose port 8000
 EXPOSE 8000
 
 # Start Gunicorn with a 180-second timeout to allow the YOLOv8 and EasyOCR models
 # to fully load into Django RAM on server startup without Gunicorn killing the process.
-CMD ["gunicorn", "--chdir", "agrotrust_django", "agrotrust_django.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "180", "--workers", "1"]
+CMD ["gunicorn", "agrotrust_django.wsgi:application", "--bind", "0.0.0.0:8000", "--timeout", "180", "--workers", "1"]
