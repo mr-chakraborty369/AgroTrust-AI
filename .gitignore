@@ -46,3 +46,4 @@ build/
 # Database & Sample Binaries
 *.sqlite3
 agrotrust_django/static/*.png
+agrotrust_django/staticfiles/
